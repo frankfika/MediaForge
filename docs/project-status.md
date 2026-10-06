@@ -1,6 +1,6 @@
 # Project Status — MediaForge v0.1.0
 
-> Last updated: tag `v0.1.0` at `d4ebf76` (25 commits).
+> Last updated: tag `v0.1.0` at `d2807c3` (27 commits).
 
 This document is the single source of truth for **what works, what's tested, and what's left to ship**.
 
@@ -20,7 +20,7 @@ This document is the single source of truth for **what works, what's tested, and
 | Style judge (heuristic scoring)                          | ✅ shipped                      | `lib/style-judge.ts` + `/api/style/judge`        |
 | MCP server (Claude Code / Cursor / Codex)                | ✅ shipped                      | `lib/mcp-server.ts` + `scripts/mcp-demo.mjs`     |
 | Public WeChat rich-text + ZIP export                     | ✅ shipped                      | `lib/export.ts` + `components/post-card.tsx`     |
-| /api/embed (semantic-search demo)                        | ✅ shipped, mock vectors        | `lib/embed.ts`                                   |
+| /api/embed (semantic-search demo)                        | ✅ shipped                       | `lib/embed.ts` — OpenAI provider when `OPENAI_API_KEY` is set, deterministic mock otherwise |
 | /api/metrics (rewrites / composes / …)                   | ✅ shipped                      | `lib/metrics.ts`                                 |
 | i18n (zh ↔ en)                                           | ✅ shipped                      | `lib/i18n.ts` + `lib/use-t.tsx`                  |
 | Docker self-host                                         | ✅ shipped, image never built   | `Dockerfile` + `docker-compose.yml`              |
@@ -35,8 +35,8 @@ This document is the single source of truth for **what works, what's tested, and
 | `pnpm typecheck`             | 0 errors                                |
 | `pnpm lint`                  | 0 errors, 0 warnings                    |
 | `pnpm format:check`          | passes                                  |
-| `pnpm test` (vitest)         | **219 / 219 passing**, 18 files, ~0.7 s |
-| `pnpm test:e2e` (playwright) | **20 / 20 passing**, ~28 s              |
+| `pnpm test` (vitest)         | **225 / 225 passing**, 18 files, ~0.7 s |
+| `pnpm test:e2e` (playwright) | **20 / 20 passing**, ~38 s              |
 | `pnpm build`                 | clean, 20 routes                        |
 | Overall line coverage        | **99.81 %**                             |
 | Overall branch coverage      | **97.71 %**                             |
@@ -65,7 +65,7 @@ The default `pnpm dev` boot — **no `.env.local`, no keys, no DB** — already 
 | Real LLM output          | `ANTHROPIC_API_KEY=sk-ant-...`                                                    | `/api/health` shows `mode: "anthropic"`, badge turns green                 |
 | Postgres cloud sync      | `DATABASE_URL=postgresql://…`                                                     | `/styles` exposes the "云端" tab + "立即同步" + version history + rollback |
 | XHS login-walled fetches | paste cookie in `Settings` page or `XHS_COOKIE=…` env                             | `pnpm test:xhs <url>` + `/rewrite` get past the login wall                 |
-| Real semantic search     | swap `lib/embed.ts` for OpenAI `text-embedding-3-small` (one function to replace) | `cosineSim` returns semantic scores                                        |
+| Real semantic search     | `OPENAI_API_KEY=sk-…` (and optional `OPENAI_EMBEDDING_MODEL`)                     | `/api/embed` automatically uses OpenAI; falls back to mock on upstream error |
 | Public deployment        | Vercel project + Neon project + 5 minutes of `.env` paste                         | see `docs/deployment.md`                                                   |
 
 ---
@@ -74,7 +74,6 @@ The default `pnpm dev` boot — **no `.env.local`, no keys, no DB** — already 
 
 - Style blind-test judge (`docs/style-agent.md` §6) — autonomous loop that refines a style until a held-out test gets ≥ 60 % indistinguishable from human.
 - Postgres integration test in CI (currently requires `DATABASE_URL` on the runner).
-- OpenAI embeddings provider (one replacement of `generateEmbeddings`).
 - i18n strings still hard-coded as Chinese inside the chat `SUGGESTIONS` list (3 strings).
 
 None of these are blockers for v0.1.0.
