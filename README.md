@@ -94,6 +94,15 @@ Vercel + Neon,约 5 分钟:
 
 完整说明:[docs/deployment.md](docs/deployment.md)。
 
+### Docker 自托管
+
+```bash
+docker compose up -d --build                 # 仅应用,http://localhost:3000
+docker compose --profile db up -d --build    # 附带 Postgres(DATABASE_URL=postgres://mf:mf@db:5432/mediaforge)
+```
+
+环境变量同上表,留空 `ANTHROPIC_API_KEY` 即 mock LLM。
+
 ## Project Status
 
 **v0.1.0** — 5 页面 · 13 个 API · MCP server · mock LLM · 演示数据 · 15 个单测。

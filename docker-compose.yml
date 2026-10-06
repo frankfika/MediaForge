@@ -1,0 +1,19 @@
+# docker compose up -d --build            # app only (localStorage styles, mock LLM unless ANTHROPIC_API_KEY set)
+# docker compose --profile db up -d --build   # + local Postgres; then: DATABASE_URL=postgres://mf:mf@localhost:5432/mediaforge pnpm db:push
+services:
+  app:
+    build: .
+    ports: ["3000:3000"]
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}   # empty -> mock LLM
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-4-5}
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+      DATABASE_URL: ${DATABASE_URL:-}              # set to postgres://mf:mf@db:5432/mediaforge with --profile db
+  db:
+    profiles: [db]
+    image: postgres:16
+    environment: { POSTGRES_USER: mf, POSTGRES_PASSWORD: mf, POSTGRES_DB: mediaforge }
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+volumes:
+  pgdata:

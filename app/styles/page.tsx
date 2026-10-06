@@ -8,6 +8,7 @@ import { loadDemoStyles, setActiveStyle, useStyles } from "@/lib/styles-store";
 import { deleteStyle, history, migrate, refine as refineStyle, rollback, saveStyle, setMode, syncNow, useStylesDb } from "@/lib/styles-sync";
 import { downloadStyles, parseImport } from "@/lib/style-transfer";
 import { DEMO_TEXTS, SIGNAL_LABELS, type JudgeResult, type Signals } from "@/lib/style-judge";
+import type { StyleDiff } from "@/lib/style-diff";
 import type { Style, StyleVersion } from "@/lib/types";
 
 /** Storage mode switch, manual sync, degrade warning and the inline "upload local styles" prompt. */
@@ -47,8 +48,22 @@ function StorageBar() {
 
 function History({ id, current, onRollback }: { id: string; current: number; onRollback: (v: number) => void }) {
   const [versions, setVersions] = useState<StyleVersion[] | null>(null);
+  const [base, setBase] = useState<number | null>(null);
+  const [cmp, setCmp] = useState<{ from: number; to: number; diff: StyleDiff } | { error: string } | null>(null);
   useEffect(() => void history(id).then((v) => setVersions(v ?? null)), [id, current]);
   if (!versions) return null;
+
+  async function compare(v: number) {
+    if (base === null || base === v) return setBase(base === v ? null : v);
+    const [from, to] = [Math.min(base, v), Math.max(base, v)];
+    setBase(null);
+    try {
+      setCmp({ from, to, diff: (await post<{ diff: StyleDiff }>(`/api/style/${id}/diff`, { from, to })).diff });
+    } catch (e) {
+      setCmp({ error: e instanceof Error ? e.message : "对比失败" });
+    }
+  }
+
   return (
     <ul className="mt-2 flex flex-col gap-1.5 text-xs">
       {versions.map((v) => (
@@ -56,11 +71,18 @@ function History({ id, current, onRollback }: { id: string; current: number; onR
           <div className="flex items-center gap-2">
             <span className="font-medium">v{v.version}</span>
             <span className="text-muted">{new Date(v.createdAt).toLocaleString()}</span>
-            {v.version === current ? (
-              <span className="ml-auto text-muted">当前</span>
-            ) : (
-              <Button size="sm" variant="outline" className="ml-auto h-6 px-2 text-xs" onClick={() => onRollback(v.version)}>回滚到此版本</Button>
-            )}
+            <span className="ml-auto flex items-center gap-1.5">
+              {versions.length > 1 && (
+                <Button size="sm" variant={base === v.version ? "primary" : "outline"} className="h-6 px-2 text-xs" onClick={() => compare(v.version)}>
+                  {base === null ? "对比" : base === v.version ? "取消" : `对比 v${base}`}
+                </Button>
+              )}
+              {v.version === current ? (
+                <span className="text-muted">当前</span>
+              ) : (
+                <Button size="sm" variant="outline" className="h-6 px-2 text-xs" onClick={() => onRollback(v.version)}>回滚到此版本</Button>
+              )}
+            </span>
           </div>
           {v.changelog?.map((c) => <p key={c} className="mt-1 text-muted">{c}</p>)}
           <details className="mt-1">
@@ -69,6 +91,26 @@ function History({ id, current, onRollback }: { id: string; current: number; onR
           </details>
         </li>
       ))}
+      {cmp && (
+        <li className="rounded-lg border border-line p-2" aria-label="版本对比">
+          {"error" in cmp ? (
+            <p className="text-red-500">{cmp.error}</p>
+          ) : (
+            <>
+              <p className="font-medium">v{cmp.from} → v{cmp.to} <span className="font-normal text-muted">+{cmp.diff.prompt.added} / −{cmp.diff.prompt.removed} 行</span></p>
+              <pre className="mt-1 whitespace-pre-wrap leading-relaxed">
+                {cmp.diff.prompt.chunks.map((c, i) => (
+                  <span key={i} className={c.type === "added" ? "block bg-emerald-500/15" : c.type === "removed" ? "block bg-red-500/15 line-through" : "block text-muted"}>{c.text.replace(/\n$/, "")}</span>
+                ))}
+              </pre>
+              {(["vocabulary", "devices", "taboos"] as const).map((k) => {
+                const d = cmp.diff.features[k];
+                return d.added.length + d.removed.length > 0 && <p key={k} className="mt-1 text-muted">{k}: {d.added.map((w) => `+${w}`).join(" ")} {d.removed.map((w) => `−${w}`).join(" ")}</p>;
+              })}
+            </>
+          )}
+        </li>
+      )}
     </ul>
   );
 }
