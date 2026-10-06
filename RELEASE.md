@@ -45,6 +45,7 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 32. `896f8a1` R33 — onboarding step 4 link fixed: serve docs/mcp.md as public/mcp-guide.md so Next.js serves it. branches coverage 96.83%→98.01% via +6 unit tests in i18n/embed/export/styles-sync (no source changes).
 33. `1356727` R34 — i18n gains a third locale (ja, ~170 keys, typed key parity), Playwright reporter adds 'github' in CI for PR annotations, e2e artifact uses 'if: always()' to always upload the report, new docs/release-notes.md (中文 user-story release post), README links it.
 34. `4326318` R35-R37 (tag) — i18n adds fourth locale (ko, 157 keys, parity-tested); /api/styles/[id]/duplicate (cloud path, returns new uuid with 'name (copy)'); bug fix in toVersion() — features from drizzle jsonb is null | undefined, normalise to undefined before cast (otherwise ApiStyle.features: required rejects null).
+35. `f89eb32` R38 — /api/styles/[id]/rename (styleRoute cloud path, drizzle update of styles.name, currentVersion/history untouched, zod name 1-60); GET /api/embed/[query] retrieval (?corpus= comma-separated or 5 default MediaForge docs, ?topK= default 5/max 50, reuses generateEmbeddingsAuto + cosineSim; parseEmbedQs in lib/embed.ts since Next route files allow no extra exports). 251→274 vitest (+23), 25→28 e2e (+3), lines 99.82%.
 
 ## Known limits
 
