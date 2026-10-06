@@ -41,6 +41,7 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 28. `3a786fe` R28 — /api/styles/[id]/export single-file download (cloud path; slug filename; 503 NO_DB without DB; throws Response with content-disposition). docs/project-status.md refreshed (27→28 commits, OpenAI provider no longer 'swap lib/embed.ts').
 29. `fedbe1e` R30 (tag) — /api/search retrieval route (POST {query, corpus, topK} -> {provider, model, results[]}); /search page now hits the server route + shows provider/model badge; e2e for the new endpoint + body validation.
 30. `e7ea085` R31 — chat suggestion chips: label (chat.sN) vs real query (new chat.sNQuery, zh placeholder-style / en imperative); chat.tsx functions 90.9%→100%; scripts/push.sh (secret-leak + remote/tag checks, pushes main + tag, --check dry run) + `pnpm push` + README First push section.
+31. `5f1b8c3` R32 (tag) — components/onboarding.tsx + 12 i18n keys (firstRun.*): first-visit card on /showcase with 4 steps (styles/search/showcase/docs/mcp.md), localStorage flag `mediaforge.visited` with SSR-safe hydration gate, 4 unit tests + 1 e2e (dismiss survives refresh).
 
 ## Known limits
 
