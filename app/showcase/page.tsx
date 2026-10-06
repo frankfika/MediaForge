@@ -1,5 +1,6 @@
 "use client";
 import { FileText, Inbox, Link2 } from "lucide-react";
+import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { Chat } from "@/components/chat";
 import { EmptyState } from "@/components/empty-state";
@@ -74,6 +75,9 @@ export default function Showcase() {
   return (
     <div className="space-y-10">
       <h1 className="text-3xl font-semibold tracking-tight">组件预览</h1>
+      <Link href="/search" className="text-sm text-accent underline">
+        语义搜索 demo →
+      </Link>
       <Section title="Button">
         <div className="flex gap-2">
           <Button>Primary</Button>

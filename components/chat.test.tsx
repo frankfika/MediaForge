@@ -88,6 +88,13 @@ describe("Chat", () => {
     expect(host.textContent).toContain("boom");
   });
 
+  it("试一下 non-Error rejection falls back to 失败了", async () => {
+    vi.stubGlobal("fetch", () => Promise.reject("nope"));
+    await render();
+    await act(async () => button(/试一下/).click());
+    expect(host.textContent).toContain("失败了");
+  });
+
   it("variant drawer vs page", async () => {
     await render("drawer");
     expect(host.firstElementChild!.className).toContain("min-h-full");

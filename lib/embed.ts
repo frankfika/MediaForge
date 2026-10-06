@@ -16,3 +16,10 @@ export function generateEmbeddings(texts: string[]): number[][] {
     });
   });
 }
+
+/** Cosine similarity; 0 if either vector has zero length. */
+export function cosineSim(a: number[], b: number[]): number {
+  const dot = a.reduce((s, x, i) => s + x * (b[i] ?? 0), 0);
+  const n = Math.hypot(...a) * Math.hypot(...b);
+  return n ? dot / n : 0;
+}

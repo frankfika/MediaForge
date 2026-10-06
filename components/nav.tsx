@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/rewrite", label: "改写" },
   { href: "/editor", label: "创作" },
   { href: "/styles", label: "风格" },
+  { href: "/search", label: "搜索" },
   { href: "/settings", label: "设置" },
   { href: "/showcase", label: "组件" },
 ];
