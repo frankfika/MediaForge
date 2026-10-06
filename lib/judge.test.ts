@@ -47,7 +47,10 @@ describe("style judge", () => {
     const r = judgeStyle({ style, sampleText: DEMO_TEXTS[1]!.text, referenceTexts: refs });
     const sum = (Object.keys(WEIGHTS) as (keyof typeof WEIGHTS)[]).reduce((s, k) => s + WEIGHTS[k] * r.signals[k], 0);
     expect(r.score).toBe(Math.round(sum * 100));
-    for (const v of Object.values(r.signals)) (expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(1));
+    for (const v of Object.values(r.signals)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
   });
   it("feedback names the weakest signal", () => {
     const r = judgeStyle({ style, sampleText: near + "太棒了!营销话术", referenceTexts: refs });

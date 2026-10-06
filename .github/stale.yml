@@ -1,0 +1,6 @@
+# Config for the stale bot (probot/stale). Issues: 30 days idle → stale, closed 7 days later.
+daysUntilStale: 30
+daysUntilClose: 7
+exemptLabels: [bug, feature]
+staleLabel: stale
+markComment: This has had no activity for 30 days and will be closed in 7 days unless updated.
