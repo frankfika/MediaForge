@@ -22,7 +22,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 11. `856f3bf` R12 — social-preview 1280x640, release workflow, Drizzle SQL migration
 12. `860002a` R13 — Vitest coverage (v8), Dockerfile + docker-compose, style version diff API
 13. `45eadcc` R14 — fetcher coverage 9%→98% (+ 20 tests), 3 real-flow e2e (import-export, judge, demo-flow)
-14. `7661ad4` R15 (tag) — styles-store + cookie + utils unit coverage (overall 55%→65%)
+14. `7661ad4` R15 — styles-store + cookie + utils unit coverage (overall 55%→65%)
+15. `14684db` R16 (tag) — export 100%, styles-db 100%, styles-sync 92.85% (overall 65%→92%)
 
 ## Known limits
 - The judge is heuristic (char-bigram vocabulary, S/M/L rhythm); the LLM blind-test loop in `docs/style-agent.md` §6 is not implemented.
