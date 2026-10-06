@@ -11,7 +11,7 @@ Paste a link or a topic. AI writes it in *your* voice for WeChat, X, Xiaohongshu
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](.github/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-<img src="docs/assets/home.png" alt="MediaForge" width="720" />
+<img src="docs/assets/og.png" alt="MediaForge" width="720" />
 
 </div>
 
@@ -26,7 +26,6 @@ pnpm dev                          # 3. http://localhost:3000
 
 4. **第一行玩起来**:打开首页 → 点「试一下:示例风格 + example.com → 4 平台」,无需任何 key;或粘贴 `https://x.com/<user>/status/<id>` 让 Agent 抓取并改写。
 
-<!-- TODO: demo GIF -->
 <img src="docs/assets/demo.gif" alt="demo" width="720" />
 
 ## Features
@@ -40,6 +39,10 @@ pnpm dev                          # 3. http://localhost:3000
 | **导出与 MCP** | 公众号内联 HTML、ZIP 打包;MediaForge 本身也是 MCP server,可被 Claude Code / Cursor / Codex 调用([docs/mcp.md](docs/mcp.md))。<br/><img src="docs/assets/demo-output.png" alt="export" width="480" /> |
 
 无 `ANTHROPIC_API_KEY` 时所有路由返回确定性 mock(响应里 `"llm": "mock"`,右下角有徽章),方便试用与测试。
+
+## Showcase
+
+`pnpm dev` 后访问 [`/showcase`](http://localhost:3000/showcase),逐个预览 Button、PostTabs、PlatformPicker、Chat、LlmModeBadge、EmptyState。
 
 ## Architecture
 
