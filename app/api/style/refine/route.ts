@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { route } from "@/lib/http";
 import { refineStyle } from "@/lib/llm";
+import { inc } from "@/lib/metrics";
 import { StyleRefSchema, type Style } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -17,6 +18,7 @@ export const POST = route(
     .refine((b) => b.feedback || (b.original && b.edited), "Provide feedback or original+edited"),
   async ({ style, ...evidence }) => {
     const { prompt, changelog } = await refineStyle({ style, ...evidence });
+    inc("refines");
     return { style: { ...style, prompt, version: style.version + 1 } satisfies Style, changelog };
   },
 );

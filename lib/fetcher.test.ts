@@ -232,3 +232,38 @@ describe("fetchLink: firecrawl fallback", () => {
     expect((await fetchLink("https://wall.example.com/a")).title).toBe("FC title");
   });
 });
+
+describe("fetchLink: sparse metadata branches", () => {
+  it("WeChat page without title/author nodes falls back to og:title / empty author", async () => {
+    mockFetch(() => ({ body: page(`<div id="js_content">${longText}</div>`, `<meta property="og:title" content="OG">`) }));
+    const s = await fetchLink("https://mp.weixin.qq.com/s/sparse");
+    expect(s).toMatchObject({ title: "OG", author: "" });
+  });
+  it("firecrawl: ogTitle fallback, no author, no metadata", async () => {
+    vi.stubEnv("FIRECRAWL_API_KEY", "fc-test");
+    const thin = page("<p>hi</p>");
+    const reply = (data: unknown) => (url: string) => (url.includes("firecrawl") ? { body: { data } } : { body: thin });
+    mockFetch(reply({ markdown: longText, metadata: { ogTitle: "OGT" } }));
+    expect(await fetchLink("https://thin.example.com/fc1")).toMatchObject({ title: "OGT", author: "", images: [] });
+    mockFetch(reply({ markdown: longText }));
+    expect((await fetchLink("https://thin.example.com/fc2")).title).toBe("");
+  });
+  it("firecrawl: empty markdown / missing data keep the local result", async () => {
+    vi.stubEnv("FIRECRAWL_API_KEY", "fc-test");
+    const thin = page("<p>hi</p>", `<meta property="og:title" content="Thin">`);
+    mockFetch((url) => (url.includes("firecrawl") ? { body: { data: { markdown: "  " } } } : { body: thin }));
+    expect((await fetchLink("https://thin.example.com/fc3")).title).toBe("Thin");
+    mockFetch((url) => (url.includes("firecrawl") ? { body: {} } : { body: thin }));
+    expect((await fetchLink("https://thin.example.com/fc4")).title).toBe("Thin");
+  });
+  it("generic page: no article, no og → empty fields", async () => {
+    mockFetch(() => ({ body: "<html><body></body></html>" }));
+    expect(await fetchLink("https://empty.example.com/a")).toMatchObject({ title: "", text: "" });
+  });
+  it("img without http src is dropped; data-src preferred", async () => {
+    mockFetch(() => ({
+      body: page(`<div id="js_content">${longText}<img data-src="https://i/a.png" src="x"><img src="/rel.png"><img></div>`),
+    }));
+    expect((await fetchLink("https://mp.weixin.qq.com/s/imgs")).images).toEqual(["https://i/a.png"]);
+  });
+});

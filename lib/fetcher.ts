@@ -6,6 +6,7 @@
  */
 import { Readability } from "@mozilla/readability";
 import { parseHTML } from "linkedom";
+import { inc } from "./metrics";
 import type { Source } from "./types";
 
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36";
@@ -144,6 +145,7 @@ export async function fetchLink(raw: string, cookies?: Cookies): Promise<Source>
 
   const u = new URL(raw);
   assertPublic(u);
+  inc("fetches");
   const host = u.hostname.replace(/^www\./, "");
 
   let value: Source;

@@ -33,3 +33,17 @@ describe("post", () => {
     await expect(post("/api/x", {})).rejects.toThrow("nope");
   });
 });
+
+describe("error edge cases", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("500 'Internal error' when handler throws a non-Error", async () => {
+    const r = await route(z.object({}), async () => Promise.reject("str"))(req("{}"));
+    expect(await r.json()).toEqual({ error: "Internal error" });
+  });
+  it("post throws the server's error message, else statusText", async () => {
+    vi.stubGlobal("fetch", async () => Response.json({ error: "nope" }, { status: 400 }));
+    await expect(post("/x", {})).rejects.toThrow("nope");
+    vi.stubGlobal("fetch", async () => new Response("{}", { status: 418, statusText: "Teapot" }));
+    await expect(post("/x", {})).rejects.toThrow("Teapot");
+  });
+});

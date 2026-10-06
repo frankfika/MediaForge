@@ -30,3 +30,26 @@ describe("diffStyleVersions", () => {
     expect(diffStyleVersions(v(1, "x"), v(2, "")).prompt).toMatchObject({ added: 0, removed: 1 });
   });
 });
+
+describe("diffStyleVersions: missing / empty inputs", () => {
+  const bare = (prompt: string): StyleVersion => ({ version: 1, prompt, createdAt: "2026-01-01T00:00:00Z" });
+  it("no features on either side", () => {
+    const d = diffStyleVersions(bare(""), bare(""));
+    expect(d.prompt).toEqual({ added: 0, removed: 0, chunks: [] });
+    expect(d.features).toEqual({
+      vocabulary: { added: [], removed: [] },
+      devices: { added: [], removed: [] },
+      taboos: { added: [], removed: [] },
+      avgSentenceLength: 0,
+      rhythmChanged: false,
+    });
+  });
+  it("features appearing from nothing, empty prompt → large prompt", () => {
+    const big = Array.from({ length: 500 }, (_, i) => `line ${i}`).join("\n");
+    const d = diffStyleVersions(bare(""), v(2, big, ["x"]));
+    expect(d.prompt.added).toBe(500);
+    expect(d.features.vocabulary.added).toEqual(["x"]);
+    expect(d.features.rhythmChanged).toBe(true);
+    expect(d.features.avgSentenceLength).toBe(12);
+  });
+});

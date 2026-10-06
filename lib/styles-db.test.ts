@@ -159,3 +159,15 @@ describe("styleRoute", () => {
     expect(r2.status).toBe(418);
   });
 });
+
+describe("styleRoute: edge cases", () => {
+  const post = () => new Request("http://x", { method: "POST", body: "{}" });
+  it("id defaults to '' when the route has no [id]; non-Error throw → 'Database error'", async () => {
+    getDb.mockReturnValue({});
+    let seen = "?";
+    await styleRoute(null, async (c) => void (seen = c.id))(post(), { params: Promise.resolve({}) });
+    expect(seen).toBe("");
+    const r = await styleRoute(null, async () => Promise.reject("x"))(post(), { params: Promise.resolve({}) });
+    expect((await r.json()).error).toBe("Database error");
+  });
+});

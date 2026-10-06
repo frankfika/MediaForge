@@ -4,6 +4,7 @@ import { model, styleSystem } from "@/lib/ai";
 import { fetchLink } from "@/lib/fetcher";
 import { compose, llmMode } from "@/lib/llm";
 import { route } from "@/lib/http";
+import { inc } from "@/lib/metrics";
 import { StyleRefSchema } from "@/lib/types";
 
 export const maxDuration = 120;
@@ -17,6 +18,7 @@ export const POST = route(
   }),
   async ({ prompt, links = [], style }) => {
     const refs = (await Promise.allSettled(links.map((l) => fetchLink(l)))).flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+    inc("composes");
     // no API key: deterministic mock draft (sent as one text chunk; useCompletion handles it the same)
     if (llmMode() === "mock")
       return new Response(await compose({ topic: prompt, references: refs, style }), {

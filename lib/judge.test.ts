@@ -62,3 +62,41 @@ describe("style judge", () => {
     expect(judgeStyle({ style, sampleText: synthesizeText(style), referenceTexts: [synthesizeText(style)] }).score).toBe(100);
   });
 });
+
+describe("style judge: degenerate inputs", () => {
+  const bare = { prompt: "写得短一点", features: undefined };
+  it("empty sample / no references / no taboos zero the dependent signals without throwing", () => {
+    const r = judgeStyle({ style: bare, sampleText: "", referenceTexts: [] });
+    expect(r.signals).toMatchObject({ sentenceLength: 0, sentenceCountMatch: 0, tabooCompliance: 1 });
+    expect(r.score).toBeGreaterThanOrEqual(0);
+  });
+  it("references given but empty sample → count match 0", () => {
+    expect(judgeStyle({ style: bare, sampleText: "", referenceTexts: refs }).signals.sentenceCountMatch).toBe(0);
+  });
+  it("tabooCompliance([]) is 1", () => expect(tabooCompliance("任何!文字", [])).toBe(1));
+});
+
+describe("synthesizeText: feature-less and rhythm variants", () => {
+  const f = (rhythm: string) => ({ avgSentenceLength: 12, vocabulary: ["结论"], rhythm, devices: [], taboos: [] });
+  it("falls back to prompt tokens and default length without features", () => {
+    const t = synthesizeText({ prompt: "结论先行 取舍", features: undefined });
+    expect(t.endsWith("。")).toBe(true);
+    expect(t.split("。").filter(Boolean)).toHaveLength(6);
+  });
+  it("uses the prompt when features.vocabulary is empty", () => {
+    expect(synthesizeText({ prompt: "alpha beta", features: { ...f("x"), vocabulary: [] } })).toMatch(/alpha|beta/);
+  });
+  it("short-short-long vs long rhythms vary sentence length; others are uniform", () => {
+    const lens = (r: string) =>
+      synthesizeText({ prompt: "p", features: f(r) }, 3)
+        .split("。")
+        .filter(Boolean)
+        .map((s) => s.length);
+    const [a, b, c] = lens("short-short-long");
+    expect(c!).toBeGreaterThan(a!);
+    expect(a).toBe(b);
+    const [l1, , l3] = lens("long");
+    expect(l1!).toBeGreaterThan(l3!);
+    expect(new Set(lens("flat")).size).toBe(1);
+  });
+});

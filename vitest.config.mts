@@ -1,3 +1,5 @@
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
@@ -5,7 +7,9 @@ export default defineConfig({
   oxc: { jsx: { runtime: "automatic" } }, // tsconfig has jsx:preserve (Next); tests need real JSX
   resolve: { alias: { "@": fileURLToPath(new URL("./", import.meta.url)) } },
   test: {
+    env: { METRICS_FILE: join(tmpdir(), "mediaforge-test-metrics.json") }, // keep tests out of .data/
     environment: "happy-dom",
+    pool: "vmThreads",
     include: ["lib/**/*.test.ts", "components/**/*.test.tsx"],
     exclude: ["e2e/**", "node_modules/**"],
     coverage: {

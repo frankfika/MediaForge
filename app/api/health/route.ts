@@ -9,6 +9,8 @@ const ENDPOINTS = [
   "rewrite",
   "compose",
   "export",
+  "embed",
+  "metrics",
   "style/learn",
   "style/refine",
   "styles",

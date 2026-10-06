@@ -2,6 +2,7 @@ import { z } from "zod";
 import { fetchLink } from "@/lib/fetcher";
 import { route } from "@/lib/http";
 import { rewrite } from "@/lib/llm";
+import { inc } from "@/lib/metrics";
 import { PlatformSchema, SourceSchema, StyleRefSchema } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -20,6 +21,8 @@ export const POST = route(
     .refine((b) => b.url || b.source, "Provide url or source"),
   async ({ url, source, platforms, style, instruction, xhsCookie }) => {
     const src = source ?? (await fetchLink(url!, { xhs: xhsCookie }));
-    return { source: src, ...(await rewrite({ source: src, platforms, style, instruction })) };
+    const out = await rewrite({ source: src, platforms, style, instruction });
+    inc("rewrites");
+    return { source: src, ...out };
   },
 );

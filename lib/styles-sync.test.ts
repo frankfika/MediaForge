@@ -193,3 +193,35 @@ describe("useStylesDb", () => {
     await h.unmount();
   });
 });
+
+describe("edge branches", () => {
+  it("5xx / 4xx without an error field fall back to statusText; non-JSON body tolerated", async () => {
+    routes["GET /api/styles"] = () => ({ status: 503, body: {} });
+    await setMode("db");
+    expect(localStorage.getItem("mediaforge.styles.mode")).toBe("local"); // degraded
+    await goDb([api("c")]);
+    routes["POST /api/styles/c/rollback"] = () => ({ status: 400, body: {} });
+    await expect(rollback("c", 1)).rejects.toThrow();
+  });
+  it("rollback degrades (returns undefined) when the server is down", async () => {
+    await goDb([api("c")]);
+    routes["POST /api/styles/c/rollback"] = () => ({ status: 503, body: { error: "down" } });
+    expect(await rollback("c", 1)).toBeUndefined();
+  });
+  it("network throw degrades with the offline message", async () => {
+    routes["GET /api/styles"] = () => new Error("offline");
+    await setMode("db");
+    expect(localStorage.getItem("mediaforge.styles.mode")).toBe("local");
+  });
+  it("syncNow with no local styles key works", async () => {
+    localStorage.removeItem("mediaforge.styles");
+    await goDb([api("only")]);
+    expect(local()).toContain("only");
+  });
+  it("saveStyle in db mode tolerates an upload failure", async () => {
+    await goDb([]);
+    routes["POST /api/styles"] = () => ({ status: 503, body: { error: "x" } });
+    await saveStyle(st("z") as never);
+    expect(local()).toContain("z");
+  });
+});
