@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { ChatDrawer } from "@/components/chat-drawer";
 import { LlmModeBadge } from "@/components/llm-mode-badge";
 import { Nav } from "@/components/nav";
+import { ThemeInit } from "@/components/theme-toggle";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +13,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem("mediaforge.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}` }} />
+      </head>
       <body className="min-h-dvh">
+        <ThemeInit />
         <Nav />
         <ChatDrawer />
         <LlmModeBadge />

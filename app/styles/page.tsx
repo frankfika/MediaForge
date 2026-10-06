@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { post } from "@/lib/http";
 import { loadDemoStyles, setActiveStyle, useStyles } from "@/lib/styles-store";
 import { deleteStyle, history, migrate, refine as refineStyle, rollback, saveStyle, setMode, syncNow, useStylesDb } from "@/lib/styles-sync";
+import { downloadStyles, parseImport } from "@/lib/style-transfer";
 import { DEMO_TEXTS, SIGNAL_LABELS, type JudgeResult, type Signals } from "@/lib/style-judge";
 import type { Style, StyleVersion } from "@/lib/types";
 
@@ -166,6 +167,31 @@ function JudgePanel({ style }: { style: Style }) {
   );
 }
 
+/** Export all / paste-to-import. Import upserts by id (same id overwrites), so re-importing never duplicates. */
+function TransferBar({ styles }: { styles: Style[] }) {
+  const [text, setText] = useState("");
+  const [msg, setMsg] = useState("");
+  async function run() {
+    const list = parseImport(text);
+    for (const s of list) await saveStyle(s);
+    setMsg(list.length ? `导入了 ${list.length} 个风格` : "没有可导入的风格(JSON 无效或字段不全)");
+    if (list.length) setText("");
+  }
+  return (
+    <div className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-card p-3 text-sm">
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted">导入/导出</span>
+        <Button size="sm" variant="outline" disabled={!styles.length} onClick={() => downloadStyles(`mediaforge-styles-${new Date().toISOString().slice(0, 10)}.json`, styles)}>导出全部</Button>
+      </div>
+      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} placeholder="粘贴风格 JSON" aria-label="导入风格 JSON" className="rounded-lg border border-line bg-transparent px-3 py-2 font-mono text-xs outline-none focus:border-accent" />
+      <div className="flex items-center gap-3">
+        <Button size="sm" onClick={run} disabled={!text.trim()}>导入</Button>
+        {msg && <span role="status" className="text-xs text-muted">{msg}</span>}
+      </div>
+    </div>
+  );
+}
+
 function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
   const { inCloud } = useStylesDb();
   const [feedback, setFeedback] = useState("");
@@ -196,6 +222,7 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
         </Button>
         <Button size="sm" variant="ghost" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? "收起" : "展开"}</Button>
         <Button size="sm" variant="ghost" aria-expanded={judging} onClick={() => setJudging(!judging)}>测评</Button>
+        <Button size="sm" variant="ghost" onClick={() => downloadStyles(`${style.name}.json`, [style])}>导出</Button>
         <Button size="sm" variant="ghost" onClick={() => deleteStyle(style.id)}>删除</Button>
       </div>
       {style.features && (
@@ -256,6 +283,7 @@ export default function StylesPage() {
         <Button size="sm" variant="outline" className="ml-auto" onClick={loadDemoStyles}>加载演示风格</Button>
       </div>
       <StorageBar />
+      <TransferBar styles={styles} />
       <div className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-dashed border-line p-4">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="风格名,例如「我的公众号」" className="h-10 rounded-lg border border-line bg-card px-3 text-sm outline-none focus:border-accent" />
         <textarea value={samples} onChange={(e) => setSamples(e.target.value)} rows={6} placeholder={"贴 3–5 篇样本:文章链接或正文。\n多篇之间用单独一行 --- 分隔。"} className="rounded-lg border border-line bg-card px-3 py-2 text-sm outline-none focus:border-accent" />

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getXhsCookie, setXhsCookie } from "@/lib/cookie";
 
 export default function SettingsPage() {
@@ -17,6 +18,10 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-5">
       <h1 className="text-2xl font-semibold tracking-tight">设置</h1>
+      <section className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-card p-4 text-sm">
+        <p className="font-medium">主题</p>
+        <ThemeToggle />
+      </section>
       <section className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-card p-4 text-sm">
         <label htmlFor="xhs" className="font-medium">小红书 cookie <span className="font-normal text-muted">(可选)</span></label>
         <textarea

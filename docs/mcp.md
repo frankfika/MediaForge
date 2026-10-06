@@ -27,6 +27,14 @@ pnpm install
 pnpm mcp          # 看到 stderr: [mediaforge-mcp] ready (llm: mock) 即正常;stdout 是协议通道
 ```
 
+## 无 key 也能跑 MCP demo
+
+```bash
+pnpm demo:mcp   # 自动拉起 stdio server,依次调 learn_style → rewrite_url,输出 JSON 摘要
+```
+
+无 `ANTHROPIC_API_KEY` 走 mock(摘要里 `"llm": "mock"`);`rewrite_url` 要抓 example.com,需联网。
+
 ## 接入
 
 下面 `/ABS/PATH/MediaForge` 换成项目绝对路径。需要真模型就在 `env` 里加 `"ANTHROPIC_API_KEY": "sk-ant-..."`。
