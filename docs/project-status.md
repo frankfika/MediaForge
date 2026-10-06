@@ -8,23 +8,23 @@ This document is the single source of truth for **what works, what's tested, and
 
 ## Quick read
 
-| Item                                                     | Status                          | Evidence                                         |
-| -------------------------------------------------------- | ------------------------------- | ------------------------------------------------ |
-| Core flows (改写 / 创作 / 风格学习 / 风格修正)           | ✅ shipped                      | 4 pages + 13+ API endpoints                      |
-| 4-platform adaptation (公众号 / X / 小红书 / B站)        | ✅ shipped                      | `lib/platforms.ts` + `lib/llm.ts#rewrite`        |
-| Mock LLM fallback                                        | ✅ shipped                      | `lib/llm.ts` + every route picks it up           |
-| Style Agent (learn / refine / version / rollback / diff) | ✅ shipped                      | `lib/styles-sync.ts` + `/api/styles/*`           |
-| Local persistence (localStorage)                         | ✅ shipped                      | `lib/styles-store.ts` + `lib/styles-transfer.ts` |
-| Cloud persistence (Postgres / Neon)                      | ✅ shipped, untested end-to-end | `lib/styles-db.ts` + Drizzle migration           |
-| Chat-first UX (Chat / ⌘K drawer)                         | ✅ shipped                      | `components/chat-drawer.tsx`                     |
-| Style judge (heuristic scoring)                          | ✅ shipped                      | `lib/style-judge.ts` + `/api/style/judge`        |
-| MCP server (Claude Code / Cursor / Codex)                | ✅ shipped                      | `lib/mcp-server.ts` + `scripts/mcp-demo.mjs`     |
-| Public WeChat rich-text + ZIP export                     | ✅ shipped                      | `lib/export.ts` + `components/post-card.tsx`     |
-| /api/embed (semantic-search demo)                        | ✅ shipped                       | `lib/embed.ts` — OpenAI provider when `OPENAI_API_KEY` is set, deterministic mock otherwise |
-| /api/metrics (rewrites / composes / …)                   | ✅ shipped                      | `lib/metrics.ts`                                 |
-| i18n (zh ↔ en)                                           | ✅ shipped                      | `lib/i18n.ts` + `lib/use-t.tsx`                  |
-| Docker self-host                                         | ✅ shipped, image never built   | `Dockerfile` + `docker-compose.yml`              |
-| Public deployment                                        | ⚠️ not done                     | user action — Vercel + Neon                      |
+| Item                                                     | Status                          | Evidence                                                                                    |
+| -------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------- |
+| Core flows (改写 / 创作 / 风格学习 / 风格修正)           | ✅ shipped                      | 4 pages + 13+ API endpoints                                                                 |
+| 4-platform adaptation (公众号 / X / 小红书 / B站)        | ✅ shipped                      | `lib/platforms.ts` + `lib/llm.ts#rewrite`                                                   |
+| Mock LLM fallback                                        | ✅ shipped                      | `lib/llm.ts` + every route picks it up                                                      |
+| Style Agent (learn / refine / version / rollback / diff) | ✅ shipped                      | `lib/styles-sync.ts` + `/api/styles/*`                                                      |
+| Local persistence (localStorage)                         | ✅ shipped                      | `lib/styles-store.ts` + `lib/styles-transfer.ts`                                            |
+| Cloud persistence (Postgres / Neon)                      | ✅ shipped, untested end-to-end | `lib/styles-db.ts` + Drizzle migration                                                      |
+| Chat-first UX (Chat / ⌘K drawer)                         | ✅ shipped                      | `components/chat-drawer.tsx`                                                                |
+| Style judge (heuristic scoring)                          | ✅ shipped                      | `lib/style-judge.ts` + `/api/style/judge`                                                   |
+| MCP server (Claude Code / Cursor / Codex)                | ✅ shipped                      | `lib/mcp-server.ts` + `scripts/mcp-demo.mjs`                                                |
+| Public WeChat rich-text + ZIP export                     | ✅ shipped                      | `lib/export.ts` + `components/post-card.tsx`                                                |
+| /api/embed (semantic-search demo)                        | ✅ shipped                      | `lib/embed.ts` — OpenAI provider when `OPENAI_API_KEY` is set, deterministic mock otherwise |
+| /api/metrics (rewrites / composes / …)                   | ✅ shipped                      | `lib/metrics.ts`                                                                            |
+| i18n (zh ↔ en)                                           | ✅ shipped                      | `lib/i18n.ts` + `lib/use-t.tsx`                                                             |
+| Docker self-host                                         | ✅ shipped, image never built   | `Dockerfile` + `docker-compose.yml`                                                         |
+| Public deployment                                        | ⚠️ not done                     | user action — Vercel + Neon                                                                 |
 
 ---
 
@@ -60,13 +60,13 @@ The default `pnpm dev` boot — **no `.env.local`, no keys, no DB** — already 
 
 ## What needs you
 
-| To enable                | You provide                                                                       | Then                                                                       |
-| ------------------------ | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Real LLM output          | `ANTHROPIC_API_KEY=sk-ant-...`                                                    | `/api/health` shows `mode: "anthropic"`, badge turns green                 |
-| Postgres cloud sync      | `DATABASE_URL=postgresql://…`                                                     | `/styles` exposes the "云端" tab + "立即同步" + version history + rollback |
-| XHS login-walled fetches | paste cookie in `Settings` page or `XHS_COOKIE=…` env                             | `pnpm test:xhs <url>` + `/rewrite` get past the login wall                 |
-| Real semantic search     | `OPENAI_API_KEY=sk-…` (and optional `OPENAI_EMBEDDING_MODEL`)                     | `/api/embed` automatically uses OpenAI; falls back to mock on upstream error |
-| Public deployment        | Vercel project + Neon project + 5 minutes of `.env` paste                         | see `docs/deployment.md`                                                   |
+| To enable                | You provide                                                   | Then                                                                         |
+| ------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Real LLM output          | `ANTHROPIC_API_KEY=sk-ant-...`                                | `/api/health` shows `mode: "anthropic"`, badge turns green                   |
+| Postgres cloud sync      | `DATABASE_URL=postgresql://…`                                 | `/styles` exposes the "云端" tab + "立即同步" + version history + rollback   |
+| XHS login-walled fetches | paste cookie in `Settings` page or `XHS_COOKIE=…` env         | `pnpm test:xhs <url>` + `/rewrite` get past the login wall                   |
+| Real semantic search     | `OPENAI_API_KEY=sk-…` (and optional `OPENAI_EMBEDDING_MODEL`) | `/api/embed` automatically uses OpenAI; falls back to mock on upstream error |
+| Public deployment        | Vercel project + Neon project + 5 minutes of `.env` paste     | see `docs/deployment.md`                                                     |
 
 ---
 
