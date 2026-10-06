@@ -25,7 +25,8 @@
     "lint": "eslint .",
     "test:xhs": "node --import tsx scripts/test-xhs-fetch.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "push": "bash scripts/push.sh"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

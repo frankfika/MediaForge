@@ -63,10 +63,13 @@ describe("Chat", () => {
     expect(host.querySelectorAll("button.rounded-full")).toHaveLength(3);
   });
 
-  it("chip fills the textarea", async () => {
+  it("chip shows the label but fills the query into the textarea", async () => {
     await render();
-    await act(async () => button(/AI 编程助手/).click());
-    expect(textarea().value).toContain("AI 编程助手");
+    const chip = button(/粘贴一条推文/);
+    expect(chip.textContent).toContain("粘贴一条推文");
+    await act(async () => chip.click());
+    expect(textarea().value).toBe("把 https://example.com 改写成小红书风格");
+    expect(textarea().value).not.toContain("我来改写");
   });
 
   it("试一下 posts to /api/rewrite and shows SourceCard", async () => {
@@ -111,6 +114,14 @@ describe("Chat", () => {
     expect(sendMessage).not.toHaveBeenCalled();
     await press({});
     expect(sendMessage).toHaveBeenCalledWith({ text: "hi there" }, { body: expect.objectContaining({ style: null }) });
+    expect(textarea().value).toBe("");
+  });
+
+  it("submit button sends via the form's onSubmit", async () => {
+    await render();
+    await type("hello submit");
+    await act(async () => host.querySelector<HTMLButtonElement>("button[type=submit]")!.click());
+    expect(sendMessage).toHaveBeenCalledWith({ text: "hello submit" }, { body: expect.objectContaining({ style: null }) });
     expect(textarea().value).toBe("");
   });
 

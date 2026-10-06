@@ -102,6 +102,18 @@ docker compose --profile db up -d --build    # 附带 Postgres(DATABASE_URL=post
 
 环境变量同上表,留空 `ANTHROPIC_API_KEY` 即 mock LLM。
 
+### First push
+
+本机首次推送到 GitHub:
+
+```bash
+git remote add origin git@github.com:frankfika/MediaForge.git   # 仅需一次
+pnpm push            # 检查 .env/secrets 泄漏 + remote/tag 存在,然后 push main 和 v0.1.0 tag
+pnpm push -- --check # 只跑检查,不推送(dry run)
+```
+
+推送后 Actions → Release workflow 会基于 tag 发 GitHub Release(CHANGELOG 需先有对应 `## [x.y.z]` 段)。
+
 ## Project Status
 
 **v0.1.0** — 5 页面 · 13 个 API · MCP server · mock LLM · 演示数据 · 15 个单测。

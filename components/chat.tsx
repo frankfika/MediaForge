@@ -15,7 +15,12 @@ import { useT } from "@/lib/use-t";
 import { PLATFORMS, type ChatMessage, type RewriteResult, type Source } from "@/lib/types";
 
 const transports = { page: new DefaultChatTransport({ api: "/api/chat" }), drawer: new DefaultChatTransport({ api: "/api/global-chat" }) };
-const SUGGESTIONS = ["chat.s1", "chat.s2", "chat.s3"] as const;
+/** [chip label, input query] — label is a prompt, query is what actually gets sent. */
+const SUGGESTIONS = [
+  ["chat.s1", "chat.s1Query"],
+  ["chat.s2", "chat.s2Query"],
+  ["chat.s3", "chat.s3Query"],
+] as const;
 
 const Status = ({ children }: { children: string }) => (
   <p className="flex items-center gap-2 text-xs text-muted">
@@ -64,13 +69,13 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
           <h1 className="text-3xl font-semibold tracking-tight">{t("chat.title")}</h1>
           <p className="mt-2 text-sm text-muted">{active ? t("chat.subActive", { name: active.name }) : t("chat.subNone")}</p>
           <div className="mt-8 flex flex-col items-center gap-2">
-            {SUGGESTIONS.map((k) => (
+            {SUGGESTIONS.map(([label, query]) => (
               <button
-                key={k}
-                onClick={() => setInput(t(k))}
+                key={label}
+                onClick={() => setInput(t(query))}
                 className="rounded-full border border-line px-4 py-1.5 text-sm text-muted transition hover:text-fg"
               >
-                {t(k)}
+                {t(label)}
               </button>
             ))}
             <Button variant="outline" size="sm" onClick={tryDemo} disabled={demoState === "loading"}>
