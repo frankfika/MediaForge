@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { post } from "@/lib/http";
 import { loadDemoStyles, setActiveStyle, useStyles } from "@/lib/styles-store";
 import { deleteStyle, history, migrate, refine as refineStyle, rollback, saveStyle, setMode, syncNow, useStylesDb } from "@/lib/styles-sync";
+import { DEMO_TEXTS, SIGNAL_LABELS, type JudgeResult, type Signals } from "@/lib/style-judge";
 import type { Style, StyleVersion } from "@/lib/types";
 
 /** Storage mode switch, manual sync, degrade warning and the inline "upload local styles" prompt. */
@@ -112,12 +113,66 @@ function StyleDetail({ style, cloud }: { style: Style; cloud: boolean }) {
   );
 }
 
+/** Blind-test panel: score a text against the style (deterministic, no LLM). Empty references fall back to the style's own features. */
+function JudgePanel({ style }: { style: Style }) {
+  const [text, setText] = useState("");
+  const [refs, setRefs] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<JudgeResult | null>(null);
+
+  async function run() {
+    setBusy(true);
+    setError("");
+    try {
+      const referenceTexts = refs.split(/^\s*---\s*$/m).map((s) => s.trim()).filter(Boolean);
+      setResult(await post<JudgeResult>("/api/style/judge", { style, sampleText: text, referenceTexts }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "失败了");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-3 flex flex-col gap-2 rounded-lg border border-line p-3">
+      <div className="flex flex-wrap gap-1.5">
+        {DEMO_TEXTS.map((d) => (
+          <Button key={d.label} size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setText(d.text)}>{d.label}</Button>
+        ))}
+      </div>
+      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} placeholder="贴一段待测文本,或点上面的示例" className="rounded-lg border border-line bg-transparent px-3 py-2 text-xs outline-none focus:border-accent" />
+      <textarea value={refs} onChange={(e) => setRefs(e.target.value)} rows={2} placeholder="参考样本(可选,多篇用 --- 分隔)。留空则按风格特征合成参考。" className="rounded-lg border border-line bg-transparent px-3 py-2 text-xs outline-none focus:border-accent" />
+      <Button size="sm" className="self-start" onClick={run} disabled={busy || !text.trim()}>
+        {busy && <Loader2 className="size-3.5 animate-spin" />}开始测评
+      </Button>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      {result && (
+        <div className="flex flex-col gap-1.5 text-xs">
+          <p className="text-2xl font-semibold">{result.score}<span className="ml-1 text-xs font-normal text-muted">/ 100</span></p>
+          {(Object.keys(SIGNAL_LABELS) as (keyof Signals)[]).map((k, i) => (
+            <div key={k} className="flex items-center gap-2">
+              <span className="w-16 text-muted">{SIGNAL_LABELS[k]}</span>
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-line">
+                <motion.div className="h-full rounded-full bg-accent" initial={{ width: 0 }} animate={{ width: `${Math.round(result.signals[k] * 100)}%` }} transition={{ duration: 0.5, delay: i * 0.08 }} />
+              </div>
+              <span className="w-9 text-right tabular-nums">{Math.round(result.signals[k] * 100)}%</span>
+            </div>
+          ))}
+          <p className="mt-1 text-muted">{result.feedback}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
   const { inCloud } = useStylesDb();
   const [feedback, setFeedback] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [open, setOpen] = useState(false);
+  const [judging, setJudging] = useState(false);
 
   async function refine() {
     setBusy(true);
@@ -140,6 +195,7 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
           {isActive ? "使用中" : "使用"}
         </Button>
         <Button size="sm" variant="ghost" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? "收起" : "展开"}</Button>
+        <Button size="sm" variant="ghost" aria-expanded={judging} onClick={() => setJudging(!judging)}>测评</Button>
         <Button size="sm" variant="ghost" onClick={() => deleteStyle(style.id)}>删除</Button>
       </div>
       {style.features && (
@@ -147,6 +203,7 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
           句长 ≈ {style.features.avgSentenceLength} · {style.features.rhythm} · {style.features.vocabulary.slice(0, 5).join(" / ")}
         </p>
       )}
+      {judging && <JudgePanel style={style} />}
       <AnimatePresence initial={false}>{open && <StyleDetail style={style} cloud={inCloud(style.id)} />}</AnimatePresence>
       <details className="mt-2">
         <summary className="cursor-pointer text-xs text-muted">查看风格 Prompt</summary>
