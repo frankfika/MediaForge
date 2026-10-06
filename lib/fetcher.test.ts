@@ -218,6 +218,14 @@ describe("fetchLink: firecrawl fallback", () => {
     mockFetch((url) => (url.includes("firecrawl") ? { status: 500 } : { body: thinPage }));
     expect((await fetchLink("https://thin.example.com/fail")).title).toBe("Thin");
   });
+  it("firecrawl network throw keeps the thin local result", async () => {
+    vi.stubEnv("FIRECRAWL_API_KEY", "fc-test");
+    mockFetch((url) => {
+      if (url.includes("firecrawl")) throw new Error("offline");
+      return { body: thinPage };
+    });
+    expect((await fetchLink("https://thin.example.com/throw")).title).toBe("Thin");
+  });
   it("firecrawl rescues a local fetch error", async () => {
     vi.stubEnv("FIRECRAWL_API_KEY", "fc-test");
     mockFetch((url) => (url.includes("firecrawl") ? fc(url) : { status: 403 }));

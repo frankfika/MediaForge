@@ -7,6 +7,7 @@ import { LlmModePill } from "@/components/llm-mode-badge";
 import { PlatformPicker } from "@/components/platform-picker";
 import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
+import { post } from "@/lib/http";
 import type { Platform, RewriteResult, Source } from "@/lib/types";
 
 const source: Source = {
@@ -27,6 +28,39 @@ const result: RewriteResult = {
     { platform: "bilibili", title: "example.com 科普", body: "三十秒了解互联网里最著名的示例域名。" },
   ],
 };
+
+function EmbedDemo() {
+  const [text, setText] = useState("MediaForge 让内容创作更轻松");
+  const [vec, setVec] = useState<number[] | null>(null);
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          aria-label="Embedding text"
+          className="h-9 flex-1 rounded-lg border border-line bg-card px-3 text-sm"
+        />
+        <Button
+          variant="outline"
+          onClick={async () => setVec((await post<{ embeddings: number[][] }>("/api/embed", { texts: [text] })).embeddings[0] ?? null)}
+        >
+          Embed
+        </Button>
+      </div>
+      {vec && (
+        <p data-testid="embed-out" className="font-mono text-xs text-muted">
+          {vec.length} dims: [
+          {vec
+            .slice(0, 6)
+            .map((n) => n.toFixed(3))
+            .join(", ")}
+          , …]
+        </p>
+      )}
+    </div>
+  );
+}
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
   <section className="space-y-3">
@@ -58,6 +92,9 @@ export default function Showcase() {
         <div className="rounded-[var(--radius-card)] border border-line p-4">
           <Chat variant="drawer" />
         </div>
+      </Section>
+      <Section title="Embeddings">
+        <EmbedDemo />
       </Section>
       <Section title="LlmModeBadge">
         <div className="flex gap-2">

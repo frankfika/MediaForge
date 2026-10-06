@@ -70,10 +70,7 @@ export function wechatHtml(post: PlatformPost, images: string[] = []): string {
 }
 
 const plain = (p?: PlatformPost) => (p ? (p.title ? `${p.title}\n\n${p.body}` : p.body) : "");
-const md = (p: PlatformPost | undefined, images: string[]) =>
-  p
-    ? `${p.title ? `# ${p.title}\n\n` : ""}${p.body}${images.length ? `\n\n${images.map((s, i) => `![图${i + 1}](${s})`).join("\n")}` : ""}\n`
-    : "";
+const md = (p?: PlatformPost) => (p ? `${p.title ? `# ${p.title}\n\n` : ""}${p.body}\n` : "");
 
 export type ExportBundle = {
   wechat_html: string;
@@ -89,8 +86,8 @@ export function buildExport({ posts, media }: RewriteResult): ExportBundle {
   const b: Omit<ExportBundle, "files"> = {
     wechat_html: wechat ? wechatHtml(wechat, media.images) : "",
     x_txt: plain(by("x")),
-    xhs_md: md(by("xhs"), []),
-    bilibili_md: md(by("bilibili"), []),
+    xhs_md: md(by("xhs")),
+    bilibili_md: md(by("bilibili")),
   };
   const files = [
     ["wechat.html", b.wechat_html],

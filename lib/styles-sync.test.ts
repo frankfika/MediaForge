@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const postMock = vi.fn();
 vi.mock("./http", () => ({ post: (...a: unknown[]) => postMock(...a) }));
 
-import { deleteStyle, history, refine, rollback, saveStyle, setMode, syncNow, useStylesDb } from "./styles-sync";
+import { deleteStyle, migrate, history, refine, rollback, saveStyle, setMode, syncNow, useStylesDb } from "./styles-sync";
 import { replaceStyles } from "./styles-store";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -100,6 +100,26 @@ describe("writes", () => {
     await deleteStyle("c");
     expect(fetchMock.mock.calls.some(([u, i]) => u === "/api/styles/c" && i?.method === "DELETE")).toBe(true);
     expect(local()).toEqual([]);
+  });
+});
+
+describe("migrate", () => {
+  it("uploads local-only styles then re-syncs", async () => {
+    await goDb([api("c")]);
+    replaceStyles([st("c") as never, st("l") as never]);
+    routes["POST /api/styles"] = () => ({ body: api("l") });
+    await migrate();
+    const posts = fetchMock.mock.calls.filter(([, i]) => i?.method === "POST");
+    expect(posts).toHaveLength(1);
+    expect(JSON.parse(posts[0]![1]!.body as string).id).toBe("l");
+  });
+  it("cloud outage during upload degrades to local", async () => {
+    await goDb([]);
+    replaceStyles([st("l") as never]);
+    routes["POST /api/styles"] = () => ({ status: 503, body: { error: "down" } });
+    await migrate();
+    expect(localStorage.getItem("mediaforge.styles.mode")).toBe("local");
+    expect(local()).toEqual(["l"]);
   });
 });
 
