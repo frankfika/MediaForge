@@ -25,6 +25,21 @@ test("language toggle: settings page label + nav items change between zh and en"
   await expect(page.getByRole("link", { name: "设置", exact: true })).toBeVisible();
 });
 
+test("language toggle: ja option renders UI in Japanese", async ({ page }) => {
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "日本語", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  await expect(page.getByRole("heading", { name: "設定" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "設定", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "チャット", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "書き換え", exact: true })).toBeVisible();
+  // zh strings are gone
+  await expect(page.getByRole("heading", { name: "设置" })).toHaveCount(0);
+  // ja → zh round trip
+  await page.getByRole("button", { name: "中文", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+});
+
 test("cookie locale survives a full page reload", async ({ page, context }) => {
   await page.goto("/settings");
   await page.getByRole("button", { name: "English", exact: true }).click();

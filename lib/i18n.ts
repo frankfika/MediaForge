@@ -1,8 +1,8 @@
-/** Minimal i18n: a typed dictionary, `t(key, locale, params)`, and cookie helpers. zh is the source of truth; en must have the same keys. */
-export const LOCALES = ["zh", "en"] as const;
+/** Minimal i18n: a typed dictionary, `t(key, locale, params)`, and cookie helpers. zh is the source of truth; en and ja must have the same keys. */
+export const LOCALES = ["zh", "en", "ja"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const LOCALE_COOKIE = "mediaforge.locale";
-export const HTML_LANG: Record<Locale, string> = { zh: "zh-CN", en: "en" };
+export const HTML_LANG: Record<Locale, string> = { zh: "zh-CN", en: "en", ja: "ja" };
 
 export const zh = {
   "nav.chat": "对话",
@@ -72,6 +72,7 @@ export const zh = {
   "theme.system": "跟随系统",
   "lang.zh": "中文",
   "lang.en": "English",
+  "lang.ja": "日本語",
 
   "error.title": "出了点小问题",
   "error.fallback": "页面加载失败。",
@@ -248,6 +249,7 @@ export const en: Record<Key, string> = {
   "theme.system": "System",
   "lang.zh": "中文",
   "lang.en": "English",
+  "lang.ja": "日本語",
 
   "error.title": "Something went wrong",
   "error.fallback": "The page failed to load.",
@@ -354,7 +356,184 @@ export const en: Record<Key, string> = {
   "styles.empty": "No styles yet. Paste a few articles you like and let the AI learn.",
 };
 
-const DICTS: Record<Locale, Record<Key, string>> = { zh, en };
+export const ja: Record<Key, string> = {
+  "nav.chat": "チャット",
+  "nav.rewrite": "書き換え",
+  "nav.editor": "作成",
+  "nav.styles": "スタイル",
+  "nav.search": "検索",
+  "nav.settings": "設定",
+  "nav.showcase": "コンポーネント",
+  "nav.activeStyle": "現在のスタイル",
+  "nav.defaultStyle": "デフォルトのスタイル",
+
+  "platform.wechat": "WeChat 公众号",
+  "platform.x": "X(旧 Twitter)",
+  "platform.xhs": "小紅書(RED)",
+  "platform.bilibili": "bilibili",
+
+  "common.failed": "失敗",
+  "common.retry": "再試行",
+  "common.close": "閉じる",
+
+  "chat.title": "今日は何を投稿しますか?",
+  "chat.subActive": "リンクを貼るか、テーマを一言どうぞ。現在のスタイル:{name}",
+  "chat.subNone": "リンクを貼るか、テーマを一言どうぞ。スタイル未選択のため、デフォルトの文体で書きます。",
+  "chat.s1": "ツイート / 小紅書 / bilibili のリンクを貼ると書き換えます",
+  "chat.s2": "「AI コーディングアシスタントの次の一歩」について WeChat 公众号 の記事を書いて",
+  "chat.s3": "この記事を小紅書風にして",
+  "chat.s1Query": "https://example.com を小紅書風に書き換えて",
+  "chat.s2Query": "「AI コーディングアシスタントの次の一歩」について WeChat 公众号 の記事を書いて",
+  "chat.s3Query": "この記事を小紅書風にして",
+  "chat.demo": "お試し:デモスタイル + example.com → 4 プラットフォーム",
+  "chat.fetchFailed": "取得に失敗しました:{error}",
+  "chat.fetching": "リンクを取得中…",
+  "chat.rewriteFailed": "書き換えに失敗しました:{error}",
+  "chat.rewriting": "書き換え中…",
+  "chat.thinking": "考え中…",
+  "chat.placeholder": "リンクを貼るかテーマを書いてください。例: https://example.com …(Enter で送信)",
+  "chat.send": "送信",
+
+  "drawer.label": "グローバルチャット",
+  "drawer.title": "MediaForge アシスタント",
+
+  "src.counts": "画像 {images} 件 · 動画 {videos} 件",
+  "post.emptyTitle": "どのプラットフォームのコンテンツも生成されませんでした",
+  "post.emptyHint": "プラットフォームを変えるか、入力を調整して再試行してください。",
+  "post.copied": "コピーしました",
+  "post.copy": "コピー",
+  "post.copyWechat": "WeChat 公众号 用にコピー",
+  "post.video": "動画 ↗",
+
+  "xhs.before": "小紅書の一部のノートはログインが必要です。本文を取得できなかった場合は、",
+  "xhs.link": "設定ページ",
+  "xhs.after": "で cookie を入力してください(リスクコントロールの回避は保証できません)。",
+
+  "settings.title": "設定",
+  "settings.theme": "テーマ",
+  "settings.language": "言語",
+  "settings.cookie": "小紅書 cookie",
+  "settings.optional": "(任意)",
+  "settings.save": "保存",
+  "settings.saved": "保存しました",
+  "settings.cookieHelp":
+    "ログイン済みのブラウザで小紅書を開き、開発者ツール → Network → 任意のリクエストの Cookie ヘッダーを、そのまま一行コピーして貼り付けてください。cookie はこのブラウザ内にのみ保存され(base64 エンコードは難読化であって暗号化ではありません)、取得時は小紅書のドメインへのリクエストにのみ送信されます。",
+  "settings.cookieHonest":
+    "正直な注意書き:cookie があるからと言って小紅書のリスクコントロールを必ず越えられるわけではありません。ログインが必要な一部のノートに対してもう一つの手段を与えるだけです。失敗したら本文を直接貼り付けてください。",
+  "theme.light": "ライト",
+  "theme.dark": "ダーク",
+  "theme.system": "システムに従う",
+  "lang.zh": "中文",
+  "lang.en": "English",
+  "lang.ja": "日本語",
+
+  "error.title": "ちょっとした問題が発生しました",
+  "error.fallback": "ページの読み込みに失敗しました。",
+  "notFound.text": "このページは存在しません。",
+  "notFound.home": "ホームに戻る",
+
+  "rewrite.title": "書き換え",
+  "rewrite.placeholder": "https://example.com(デモ。常に接続可能)/ x.com / 小紅書 / bilibili / WeChat 公众号",
+  "rewrite.run": "取得して書き換え",
+  "rewrite.emptyTitle": "書き換え結果はまだありません",
+  "rewrite.emptyHint": "リンクを貼り、プラットフォームを選び、「取得して書き換え」をクリック。",
+
+  "editor.title": "作成",
+  "editor.topic": "テーマまたは一言の brief",
+  "editor.links": "参考リンク(任意。スペースまたは改行区切り、最大 5 件)",
+  "editor.generate": "下書きを生成",
+  "editor.emptyTitle": "下書きはまだありません",
+  "editor.emptyHint": "テーマを書き、必要なら参考リンクを付けて「下書きを生成」をクリック。",
+  "editor.adapt": "プラットフォームに適応",
+  "editor.learn": "自分の修正から学習",
+  "editor.needStyle": "先に「スタイル」ページでスタイルを作成し、選択してください",
+  "editor.styleUpdated": "スタイルが v{version} に更新されました:{changelog}",
+
+  "search.title": "セマンティック検索",
+  "search.query": "クエリ",
+  "search.placeholder": "クエリを入力",
+  "search.note":
+    "デモではモックのベクトル(決定論的ハッシュであり、実際のセマンティクスではありません)を使い、順位付けはあくまでフローの演示です。実際の embedding モデルを接続すればセマンティックな順位付けになります。",
+
+  "showcase.title": "コンポーネントプレビュー",
+  "showcase.search": "セマンティック検索 demo →",
+
+  "firstRun.title": "MediaForge へようこそ!",
+  "firstRun.subtitle": "3 ステップですぐ始められます",
+  "firstRun.step1.title": "デモスタイルを読み込む",
+  "firstRun.step1.desc": "「デモスタイルを読み込む」をクリックして、AI があなたの声を学ぶのを見てください。",
+  "firstRun.step2.title": "セマンティック検索を試す",
+  "firstRun.step2.desc": "5 件のサンプル文書を検索して、cosine 順位付けを確認。",
+  "firstRun.step3.title": "コンポーネントプレビューを見る",
+  "firstRun.step3.desc": "/showcase には Button / PostCard / Chat / LlmModeBadge など 6 つのコンポーネントがあります。",
+  "firstRun.step4.title": "MCP サーバーに接続",
+  "firstRun.step4.desc": "Claude Code / Cursor / Codex から mediaforge ツールを呼び出せます。",
+  "firstRun.dismiss": "わかりました",
+
+  "styles.title": "スタイル",
+  "styles.loadDemo": "デモスタイルを読み込む",
+  "styles.storage": "ストレージ",
+  "styles.local": "ローカル",
+  "styles.cloud": "クラウド (Postgres)",
+  "styles.sync": "今すぐ同期",
+  "styles.gotIt": "OK",
+  "styles.pending": "クラウドに未アップロードのローカルスタイルが {n} 件あります({names})。",
+  "styles.nameSep": "、",
+  "styles.upload": "クラウドにアップロード",
+  "styles.later": "後で",
+  "styles.compare": "比較",
+  "styles.cancel": "キャンセル",
+  "styles.compareWith": "v{base} と比較",
+  "styles.compareFailed": "比較に失敗しました",
+  "styles.current": "現在",
+  "styles.rollbackTo": "このバージョンにロールバック",
+  "styles.rollbackFailed": "ロールバックに失敗しました",
+  "styles.versionCompare": "バージョン比較",
+  "styles.lines": "行",
+  "styles.vocabulary": "特徴語",
+  "styles.devices": "修辞技法",
+  "styles.taboos": "タブー",
+  "styles.noFeatures": "このスタイルには特徴データがありません。",
+  "styles.avgLen": "平均文長",
+  "styles.rhythm": "リズム",
+  "styles.lastRefine": "直近の修正:{log}",
+  "styles.none": "まだありません",
+  "styles.cloudOnly": "修正履歴を保存するのはクラウドスタイルのみです",
+  "styles.judgeText": "テストしたいテキストを貼り付けるか、上の例をクリック",
+  "styles.judgeRefs": "参照サンプル(任意。複数の場合は --- で区切る)。空欄ならスタイルの特徴から合成します。",
+  "styles.judgeRun": "テストを開始",
+  "signal.sentenceLength": "文長分布",
+  "signal.vocabularyOverlap": "語彙の重複",
+  "signal.rhythmMatch": "リズム",
+  "signal.sentenceCountMatch": "文数",
+  "signal.tabooCompliance": "タブー遵守",
+  "styles.transfer": "インポート / エクスポート",
+  "styles.exportAll": "すべてエクスポート",
+  "styles.importPlaceholder": "スタイル JSON を貼り付け",
+  "styles.importLabel": "スタイル JSON をインポート",
+  "styles.import": "インポート",
+  "styles.imported": "{n} 件のスタイルをインポートしました",
+  "styles.importNone": "インポートできるスタイルがありません(JSON が無効か、フィールドが不足しています)",
+  "styles.inUse": "使用中",
+  "styles.use": "使用",
+  "styles.collapse": "折りたたむ",
+  "styles.expand": "展開",
+  "styles.judge": "テスト",
+  "styles.export": "エクスポート",
+  "styles.delete": "削除",
+  "styles.sentenceLen": "文長 ≈ {n}",
+  "styles.viewPrompt": "スタイルプロンプトを表示",
+  "styles.history": "バージョン履歴",
+  "styles.feedback": "どこが違う?例:「固すぎる。短い文と問いかけを多くして」",
+  "styles.refine": "修正",
+  "styles.namePlaceholder": "スタイル名。例:「自分の公众号」",
+  "styles.samplesPlaceholder":
+    "サンプルを 3〜5 篇貼り付けてください:記事のリンクまたは本文。\n複数の場合は、--- だけの行で区切ってください。",
+  "styles.learn": "このスタイルを学習",
+  "styles.empty": "スタイルはまだありません。好きな記事を数篇貼り付けて、AI に学習させましょう。",
+};
+
+const DICTS: Record<Locale, Record<Key, string>> = { zh, en, ja };
 
 export const isLocale = (v: unknown): v is Locale => LOCALES.includes(v as Locale);
 

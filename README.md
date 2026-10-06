@@ -11,6 +11,8 @@ Paste a link or a topic. AI writes it in _your_ voice for WeChat, X, Xiaohongshu
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](.github/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
+📣 [**v0.1.0 发布说明**](docs/release-notes.md) — 为什么做 MediaForge,以及它如何改变多平台内容工作流
+
 <img src="docs/assets/og.png" alt="MediaForge" width="720" />
 
 </div>
