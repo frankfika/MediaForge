@@ -13,6 +13,7 @@
     "seed": "tsx scripts/seed.ts",
     "test": "vitest run",
     "test:ui": "vitest --ui",
+    "screenshots": "node scripts/screenshots.mjs",
     "test:e2e": "playwright test",
     "test:all": "pnpm test && pnpm test:e2e",
     "db:generate": "drizzle-kit generate",

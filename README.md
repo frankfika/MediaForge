@@ -11,12 +11,10 @@ Paste a link or a topic. AI writes it in *your* voice for WeChat, X, Xiaohongshu
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](.github/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-<!-- TODO: OG image / hero screenshot -->
-<img src="docs/assets/og.png" alt="MediaForge" width="720" />
+<img src="docs/assets/home.png" alt="MediaForge" width="720" />
 
 </div>
 
-> Badges 为静态占位。仓库推到 GitHub 后可换成 `https://github.com/<owner>/MediaForge/actions/workflows/ci.yml/badge.svg`。
 
 ## Quick Start
 
@@ -35,11 +33,11 @@ pnpm dev                          # 3. http://localhost:3000
 
 | | 特性 |
 |---|---|
-| **对话优先** | 抓取、改写、学风格都是 agent 的 *tool*,UI 只渲染工具结果。<br/><!-- TODO screenshot: chat --> |
-| **改写模式** | 链接(X / 小红书 / B 站 / 公众号 / 任意文章)→ 抓取 → 选平台 → 一键复制,图片视频原样保留。<br/><!-- TODO screenshot: rewrite --> |
-| **创作模式** | 话题 + 参考链接 → 流式长文 → 适配多平台。<br/><!-- TODO screenshot: editor --> |
-| **风格 Agent** | 3–5 篇样本 → 语音特征 → 风格 Prompt;可用反馈或*你的手改*迭代,支持版本回滚与云同步。<br/><!-- TODO screenshot: styles --> |
-| **导出与 MCP** | 公众号内联 HTML、ZIP 打包;MediaForge 本身也是 MCP server,可被 Claude Code / Cursor / Codex 调用([docs/mcp.md](docs/mcp.md))。<br/><!-- TODO screenshot: export --> |
+| **对话优先** | 抓取、改写、学风格都是 agent 的 *tool*,UI 只渲染工具结果。<br/><img src="docs/assets/chat-drawer.png" alt="chat" width="480" /> |
+| **改写模式** | 链接(X / 小红书 / B 站 / 公众号 / 任意文章)→ 抓取 → 选平台 → 一键复制,图片视频原样保留。<br/><img src="docs/assets/rewrite.png" alt="rewrite" width="480" /> |
+| **创作模式** | 话题 + 参考链接 → 流式长文 → 适配多平台。<br/><img src="docs/assets/demo-output.png" alt="editor" width="480" /> |
+| **风格 Agent** | 3–5 篇样本 → 语音特征 → 风格 Prompt;可用反馈或*你的手改*迭代,支持版本回滚与云同步。<br/><img src="docs/assets/styles.png" alt="styles" width="480" /> |
+| **导出与 MCP** | 公众号内联 HTML、ZIP 打包;MediaForge 本身也是 MCP server,可被 Claude Code / Cursor / Codex 调用([docs/mcp.md](docs/mcp.md))。<br/><img src="docs/assets/demo-output.png" alt="export" width="480" /> |
 
 无 `ANTHROPIC_API_KEY` 时所有路由返回确定性 mock(响应里 `"llm": "mock"`,右下角有徽章),方便试用与测试。
 
