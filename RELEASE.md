@@ -26,7 +26,9 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 13. `45eadcc` R14 — fetcher coverage 9%→98% (+ 20 tests), 3 real-flow e2e (import-export, judge, demo-flow)
 14. `7661ad4` R15 — styles-store + cookie + utils unit coverage (overall 55%→65%)
 15. `14684db` R16 — export 100%, styles-db 100%, styles-sync 92.85% (overall 65%→92%)
-16. `e028960` R17 (tag) — ai.ts 100% + llm/style-transfer 95%+ + ESLint flat config + Prettier (overall 92%→98%)
+16. `e028960` R17 — ai.ts 100% + llm/style-transfer 95%+ + ESLint flat config + Prettier (overall 92%→98%)
+17. `a961643` R18a — apply Prettier across the repo (59 files reformatted)
+18. `6472119` R18 (tag) — llm.ts branch coverage 100%, `pnpm test:xhs` real-network script, docs/xhs-cookie-test.md, CHANGELOG Unreleased
 
 ## Known limits
 
