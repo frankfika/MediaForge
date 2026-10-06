@@ -78,3 +78,29 @@ export async function generateEmbeddingsAuto(
   const vecs = generateEmbeddings(texts);
   return { vectors: vecs, provider: "mock", model: "mock-fnv1a", dim: EMBED_DIM };
 }
+
+export const MAX_CORPUS = 200;
+
+export type EmbedQs = { corpus?: string[]; topK: number };
+
+/** Parse + validate ?corpus= (comma-separated, max MAX_CORPUS docs) and ?topK= (default 5, max 50). Returns {error} for a 400. */
+export function parseEmbedQs(search: string): EmbedQs | { error: string } {
+  const sp = new URLSearchParams(search);
+  let topK = 5;
+  const rawK = sp.get("topK");
+  if (rawK != null && rawK !== "") {
+    const n = Number(rawK);
+    if (!Number.isInteger(n) || n < 1 || n > 50) return { error: "topK must be an integer in 1..50" };
+    topK = n;
+  }
+  const raw = sp.get("corpus");
+  if (raw == null) return { topK };
+  const corpus = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (corpus.length === 0) return { error: "corpus must not be empty" };
+  if (corpus.length > MAX_CORPUS) return { error: `corpus too large (max ${MAX_CORPUS} docs)` };
+  if (corpus.some((c) => c.length > 8000)) return { error: "corpus doc too long (max 8000 chars)" };
+  return { corpus, topK };
+}

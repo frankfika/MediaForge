@@ -4,8 +4,19 @@ import { z } from "zod";
 const getDb = vi.fn();
 vi.mock("./db/client", () => ({ getDb: () => getDb() }));
 
-import { addVersion, createStyle, deleteStyle, duplicateStyle, getStyle, listStyles, rollbackStyle, styleRoute } from "./styles-db";
+import {
+  addVersion,
+  createStyle,
+  deleteStyle,
+  duplicateStyle,
+  getStyle,
+  listStyles,
+  renameStyle,
+  rollbackStyle,
+  styleRoute,
+} from "./styles-db";
 import { POST } from "@/app/api/styles/[id]/duplicate/route";
+import { POST as RENAME_POST } from "@/app/api/styles/[id]/rename/route";
 
 /** Chainable, thenable fake: every builder call returns itself; awaiting pops the next queued result. */
 function fakeDb(results: unknown[]) {
@@ -118,6 +129,21 @@ describe("duplicateStyle", () => {
       [{ ...V(2), styleId: "s2" }],
     ]);
     expect((await duplicateStyle(db, "u", "s1", "Mine"))?.name).toBe("Mine");
+  });
+});
+
+describe("renameStyle", () => {
+  it("null when the style is missing", async () => expect(await renameStyle(fakeDb([[]]).db, "u", "s1", "New")).toBeNull());
+  it("updates the name via drizzle update; currentVersion and history untouched", async () => {
+    const { db, calls } = fakeDb([
+      [{ id: "s1" }], // update ... returning
+      [{ ...S, name: "New" }], // reload: style
+      [V(2), V(1)], // reload: versions
+    ]);
+    const out = await renameStyle(db, "u", "s1", "New");
+    expect(calls).toContain("update");
+    expect(out).toMatchObject({ name: "New", currentVersion: 2, prompt: "p2" });
+    expect(out?.versions?.map((v) => v.version)).toEqual([2, 1]);
   });
 });
 
@@ -245,5 +271,35 @@ describe("POST /api/styles/[id]/duplicate route", () => {
     const r = await POST(post({ name: "Clone" }), ctx);
     expect(r.status).toBe(200);
     expect(await r.json()).toMatchObject({ id: "s2", name: "Clone", prompt: "p2" });
+  });
+});
+
+describe("POST /api/styles/[id]/rename route", () => {
+  const ctx = { params: Promise.resolve({ id: "s1" }) };
+  const post = (body: unknown) => new Request("http://x", { method: "POST", body: JSON.stringify(body) });
+
+  it("503 NO_DB without DATABASE_URL", async () => {
+    getDb.mockReturnValue(null);
+    const r = await RENAME_POST(post({ name: "N" }), ctx);
+    expect(r.status).toBe(503);
+    expect((await r.json()).code).toBe("NO_DB");
+  });
+  it("404 when the style is missing", async () => {
+    getDb.mockReturnValue(fakeDb([[]]).db);
+    expect((await RENAME_POST(post({ name: "N" }), ctx)).status).toBe(404);
+  });
+  it("400 on an empty name", async () => {
+    getDb.mockReturnValue(fakeDb([[]]).db);
+    expect((await RENAME_POST(post({ name: "" }), ctx)).status).toBe(400);
+  });
+  it("400 on a name over 60 chars", async () => {
+    getDb.mockReturnValue(fakeDb([[]]).db);
+    expect((await RENAME_POST(post({ name: "x".repeat(61) }), ctx)).status).toBe(400);
+  });
+  it("200 renames: name changes, currentVersion stays", async () => {
+    getDb.mockReturnValue(fakeDb([[{ id: "s1" }], [{ ...S, name: "Fresh" }], [V(2)]]).db);
+    const r = await RENAME_POST(post({ name: "Fresh" }), ctx);
+    expect(r.status).toBe(200);
+    expect(await r.json()).toMatchObject({ name: "Fresh", currentVersion: 2, prompt: "p2" });
   });
 });

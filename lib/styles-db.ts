@@ -79,6 +79,12 @@ export async function duplicateStyle(db: Db, userId: string, id: string, name?: 
   return createStyle(db, userId, { name: name ?? `${src.name} (copy)`, prompt: src.prompt, features: src.features ?? undefined });
 }
 
+/** Rename in place; null when the style isn't owned by this user. currentVersion and history are untouched. */
+export async function renameStyle(db: Db, userId: string, id: string, name: string): Promise<ApiStyle | null> {
+  const [hit] = await db.update(styles).set({ name }).where(owned(userId, id)).returning({ id: styles.id });
+  return hit ? getStyle(db, userId, id) : null;
+}
+
 /** Append-only: always max(version)+1, even after a rollback, so history is never overwritten. */
 export async function addVersion(db: Db, userId: string, id: string, v: { prompt: string; changelog: string[] }): Promise<ApiStyle | null> {
   const ok = await db.transaction(async (tx) => {

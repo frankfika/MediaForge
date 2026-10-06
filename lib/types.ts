@@ -96,6 +96,11 @@ export const DuplicateStyleRequestSchema = z.object({
 });
 export type DuplicateStyleRequest = z.infer<typeof DuplicateStyleRequestSchema>;
 
+export const RenameStyleRequestSchema = z.object({
+  name: z.string().min(1).max(60),
+});
+export type RenameStyleRequest = z.infer<typeof RenameStyleRequestSchema>;
+
 export const FeedbackRequestSchema = z
   .object({ feedback: z.string().max(1000).optional(), original: z.string().optional(), edited: z.string().optional() })
   .refine((b) => b.feedback || (b.original && b.edited), "Provide feedback or original+edited");
