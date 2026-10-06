@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useSyncExternalStore } from "react";
+import { DEMO_STYLES } from "./demo-styles";
 import type { Style } from "./types";
 
 // MVP persistence: localStorage. Server stays stateless (style prompt travels with each request).
@@ -46,4 +47,10 @@ export function useStyles() {
 export const replaceStyles = (next: Style[]) => {
   const { active } = parse();
   write({ styles: next, active: next.some((s) => s.id === active) ? active : (next[0]?.id ?? null) });
+};
+
+/** Fill in the demo styles and make the first one active. Idempotent (fixed ids). */
+export const loadDemoStyles = () => {
+  DEMO_STYLES.forEach(upsertStyle);
+  setActiveStyle(DEMO_STYLES[0]!.id);
 };

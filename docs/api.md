@@ -67,6 +67,43 @@ Agent 工具:`fetch_link({url}) → Source`,`rewrite_post({url, platforms, instr
 { "style": Style /* version+1 */, "changelog": ["更短句", "去掉总结段"] }
 ```
 
+## `/api/styles/*` — 云端风格(Postgres)
+
+所有路由:需 `DATABASE_URL`,否则 `503 {code:"NO_DB"}`;连接/查询失败 `503 {code:"DB_UNAVAILABLE"}`(客户端据此降级到 localStorage);不存在 `404`。用户由 `x-user-id` 头(uuid,缺省为内置默认用户)标识。
+
+### GET `/api/styles` — 列表
+```jsonc
+// 200: ApiStyle[]  (不含 versions)
+[{ "id": "uuid", "name": "极简技术流", "currentVersion": 2, "prompt": "…", "features": {…} | null, "createdAt": "ISO" }]
+```
+### POST `/api/styles` — 创建
+```jsonc
+{ "id": "uuid?", "name": "…", "prompt": "…", "features": {…}? }  // 同 id 重复上传为幂等 no-op
+// 200: ApiStyle (含 versions)
+```
+### GET `/api/styles/:id` — 单个
+```jsonc
+// 200: ApiStyle + versions: [{ version, prompt, features, changelog, createdAt }]  (新→旧)
+```
+(同路径 `DELETE` → `{ ok: true }`)
+### POST `/api/styles/:id/refine` — 修正并追加版本
+```jsonc
+{ "feedback": "太正式", "original": "…", "edited": "…" }   // feedback 或 original+edited 至少其一,否则 400
+// 200: { "style": ApiStyle /* currentVersion = max+1 */, "changelog": ["+ …"] }
+```
+无 `ANTHROPIC_API_KEY` 时走 mock LLM。
+### POST `/api/styles/:id/rollback` — 回滚
+```jsonc
+{ "version": 1 }
+// 200: ApiStyle (currentVersion=1;历史保留,下次 refine 仍是 max+1);版本不存在 404
+```
+
+## `GET /api/health`
+
+```jsonc
+{ "ok": true, "mode": "mock" | "anthropic", "version": "0.1.0", "endpoints": ["/api/chat", …] }
+```
+
 ## Phase 2 预留
 
-`GET/POST /api/styles`、`GET /api/styles/:id/versions`、`POST /api/styles/:id/rollback`、`POST /api/export`(返回 ZIP)、`GET /api/media?url=`(防盗链代理)。
+`GET /api/media?url=`(防盗链代理)、ZIP 流式下载(目前客户端用 jszip 在浏览器打包,服务端可改为流式)、样式 + 模板导入。

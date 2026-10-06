@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { ChatDrawer } from "@/components/chat-drawer";
+import { LlmModeBadge } from "@/components/llm-mode-badge";
 import { Nav } from "@/components/nav";
 import "./globals.css";
 
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-dvh">
         <Nav />
         <ChatDrawer />
+        <LlmModeBadge />
         <main className="mx-auto w-full max-w-3xl px-4 pb-32 pt-6">{children}</main>
       </body>
     </html>

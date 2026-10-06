@@ -1,9 +1,10 @@
 "use client";
 import { Loader2 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { post } from "@/lib/http";
-import { setActiveStyle, useStyles } from "@/lib/styles-store";
+import { loadDemoStyles, setActiveStyle, useStyles } from "@/lib/styles-store";
 import { deleteStyle, history, migrate, refine as refineStyle, rollback, saveStyle, setMode, syncNow, useStylesDb } from "@/lib/styles-sync";
 import type { Style, StyleVersion } from "@/lib/types";
 
@@ -70,11 +71,53 @@ function History({ id, current, onRollback }: { id: string; current: number; onR
   );
 }
 
+const FEATURE_ROWS = [["vocabulary", "标志词"], ["devices", "修辞习惯"], ["taboos", "禁忌"]] as const;
+
+/** Read-only detail: features cards + latest refine changelog (cloud history only; samples are not stored). */
+function StyleDetail({ style, cloud }: { style: Style; cloud: boolean }) {
+  const [log, setLog] = useState<string | null>(null);
+  useEffect(() => {
+    if (!cloud) return;
+    history(style.id).then((vs) => setLog(vs?.find((v) => v.changelog?.length)?.changelog?.join(";") ?? null));
+  }, [style.id, style.version, cloud]);
+  const f = style.features;
+  return (
+    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {f ? (
+          <>
+            <div className="rounded-lg border border-line p-3 text-xs">
+              <p className="text-muted">平均句长</p>
+              <p className="mt-1 text-lg font-semibold">{f.avgSentenceLength}</p>
+            </div>
+            <div className="rounded-lg border border-line p-3 text-xs">
+              <p className="text-muted">节奏</p>
+              <p className="mt-1">{f.rhythm}</p>
+            </div>
+            {FEATURE_ROWS.map(([k, label]) => (
+              <div key={k} className="rounded-lg border border-line p-3 text-xs">
+                <p className="text-muted">{label}</p>
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {f[k].length ? f[k].map((w) => <span key={w} className="rounded-full bg-line px-2 py-0.5">{w}</span>) : <span className="text-muted">—</span>}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <p className="text-xs text-muted sm:col-span-2">这个风格没有特征数据。</p>
+        )}
+      </div>
+      <p className="mt-2 text-xs text-muted">最近修正:{log ?? (cloud ? "暂无" : "仅云端风格记录修正历史")}</p>
+    </motion.div>
+  );
+}
+
 function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
   const { inCloud } = useStylesDb();
   const [feedback, setFeedback] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
+  const [open, setOpen] = useState(false);
 
   async function refine() {
     setBusy(true);
@@ -96,6 +139,7 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
         <Button size="sm" variant={isActive ? "primary" : "outline"} className="ml-auto" onClick={() => setActiveStyle(style.id)}>
           {isActive ? "使用中" : "使用"}
         </Button>
+        <Button size="sm" variant="ghost" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? "收起" : "展开"}</Button>
         <Button size="sm" variant="ghost" onClick={() => deleteStyle(style.id)}>删除</Button>
       </div>
       {style.features && (
@@ -103,6 +147,7 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
           句长 ≈ {style.features.avgSentenceLength} · {style.features.rhythm} · {style.features.vocabulary.slice(0, 5).join(" / ")}
         </p>
       )}
+      <AnimatePresence initial={false}>{open && <StyleDetail style={style} cloud={inCloud(style.id)} />}</AnimatePresence>
       <details className="mt-2">
         <summary className="cursor-pointer text-xs text-muted">查看风格 Prompt</summary>
         <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed">{style.prompt}</p>
@@ -149,7 +194,10 @@ export default function StylesPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-semibold tracking-tight">风格</h1>
+      <div className="flex items-center">
+        <h1 className="text-2xl font-semibold tracking-tight">风格</h1>
+        <Button size="sm" variant="outline" className="ml-auto" onClick={loadDemoStyles}>加载演示风格</Button>
+      </div>
       <StorageBar />
       <div className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-dashed border-line p-4">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="风格名,例如「我的公众号」" className="h-10 rounded-lg border border-line bg-card px-3 text-sm outline-none focus:border-accent" />

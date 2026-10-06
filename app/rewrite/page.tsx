@@ -36,7 +36,7 @@ export default function RewritePage() {
       <input
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://x.com/…  /  小红书  /  B 站  /  公众号"
+        placeholder="https://example.com(示例,永远可达)/ x.com / 小红书 / B 站 / 公众号"
         className="h-11 rounded-xl border border-line bg-card px-4 text-sm outline-none focus:border-accent"
       />
       <XhsHint text={url} />

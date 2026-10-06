@@ -82,3 +82,15 @@ args = ["--dir", "/ABS/PATH/MediaForge", "-s", "mcp"]
 - 小红书登录态笔记:传 `xhs_cookie`(尽力而为,不保证绕过风控)。
 - MCP 服务无状态,风格不落库;要保存请自行保存返回的 `style`。
 - `rewrite_url` 拒绝内网地址。
+
+## 测 client-server 路由(有 key 之后)
+
+无 `ANTHROPIC_API_KEY` 时 MCP 与 `/api/rewrite`、`/api/styles/:id/refine` 走 mock。填 key 后验证真实链路:
+
+```bash
+echo 'ANTHROPIC_API_KEY=sk-ant-…' >> .env.local && pnpm dev
+curl -s localhost:3000/api/health          # mode 应为 "anthropic"
+curl -s -X POST localhost:3000/api/rewrite -H 'content-type: application/json' \
+  -d '{"url":"https://example.com","platforms":["xhs","x"]}'
+```
+页面右下角徽章同步显示 `LLM: Claude Sonnet 4.5`。MCP 端同理:同一环境变量下 `pnpm mcp` 会切到 Claude。

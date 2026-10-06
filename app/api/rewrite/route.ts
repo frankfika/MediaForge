@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { rewrite } from "@/lib/ai";
 import { fetchLink } from "@/lib/fetcher";
 import { route } from "@/lib/http";
+import { rewrite } from "@/lib/llm";
 import { PlatformSchema, SourceSchema, StyleRefSchema } from "@/lib/types";
 
 export const maxDuration = 60;

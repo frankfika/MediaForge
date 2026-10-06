@@ -87,3 +87,7 @@ Vercel(Fluid compute,路由 `maxDuration` 60–120s)· Neon(Phase 2)· 环境变
 ## 9. 安全
 
 SSRF 防护(§5)· 所有入参 zod 校验与长度上限 · 外部文本隔离(§4)· 不存储用户第三方凭证 · Phase 2:登录 + 每用户速率限制(Upstash)。
+
+## 10. 测试策略
+
+`pnpm test`(vitest + happy-dom,`lib/**/*.test.ts`)只覆盖**纯函数**:`wechatHtml` 的排版产物、mock LLM 的确定性/契约、`assertPublic` 的 SSRF 主机名检查。不打网络、不需要 key。路由与 UI 靠 `pnpm typecheck` + `pnpm build` + 手动 curl/浏览器冒烟;DB 路由需要 Postgres,暂无自动化测试。

@@ -73,6 +73,7 @@ docs/           architecture · product-spec · style-agent · api · data-model
 - 风格 Agent:本地存储 + Postgres 可选同步 + 版本回滚(不绕过 MCP)
 - **MCP server**:Claude Code / Cursor / Codex 可以直接调用,无 key 时有确定性 mock
 - Mock LLM:无 `ANTHROPIC_API_KEY` 时所有路由仍返回合理响应(`"llm": "mock"` 标识)
+- Round 5 新增演示数据(`/styles`「加载演示风格」、对话页「试一下」)+ LLM 模式徽章(右下角,`/api/health`);`pnpm test` 跑 vitest
 
 未做(见各文档 Roadmap):真对话 demo(填 key 即可)、登录态抓取成功率优化(只能尽力而为)、第三方平台发布自动化、Storybook、e2e tests。
 

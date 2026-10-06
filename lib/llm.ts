@@ -30,7 +30,7 @@ function topWords(text: string, n: number) {
   return [...freq].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, n).map(([w]) => w);
 }
 
-const mock = {
+export const mock = {
   async rewrite({ source, platforms, instruction }: { source: Source; platforms: Platform[]; instruction?: string }): Promise<RewriteResult> {
     const tags = topWords(source.text, 4);
     const posts = platforms.map((platform) => {
@@ -70,6 +70,7 @@ const mock = {
   },
 
   async refineStyle({ style, feedback, original, edited }: { style: StyleRef; feedback?: string; original?: string; edited?: string }) {
+    if (!feedback && !(original && edited)) throw new Error("Provide feedback or original+edited");
     const rules: string[] = [];
     if (feedback) rules.push(`User feedback: ${feedback}`);
     if (original && edited) {

@@ -8,8 +8,10 @@ import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
 import { XhsHint } from "@/components/xhs-hint";
 import { getXhsCookie } from "@/lib/cookie";
-import { useStyles } from "@/lib/styles-store";
-import type { ChatMessage } from "@/lib/types";
+import { DEMO_STYLES } from "@/lib/demo-styles";
+import { post } from "@/lib/http";
+import { loadDemoStyles, useStyles } from "@/lib/styles-store";
+import { PLATFORMS, type ChatMessage, type RewriteResult, type Source } from "@/lib/types";
 
 const transports = { page: new DefaultChatTransport({ api: "/api/chat" }), drawer: new DefaultChatTransport({ api: "/api/global-chat" }) };
 const SUGGESTIONS = ["粘贴一条推文 / 小红书 / B 站链接,我来改写", "围绕「AI 编程助手的下一步」写一篇公众号文章", "把这篇文章改成小红书风格"];
@@ -26,7 +28,21 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
   const { active } = useStyles();
   const { messages, sendMessage, status, error } = useChat<ChatMessage>({ transport: transports[variant] });
   const [input, setInput] = useState("");
+  const [demo, setDemo] = useState<(RewriteResult & { source: Source }) | null>(null);
+  const [demoState, setDemoState] = useState<"idle" | "loading" | string>("idle");
   const busy = status === "submitted" || status === "streaming";
+
+  /** Demo styles + example.com -> 4 platforms via /api/rewrite (works with the mock LLM, no key needed). */
+  async function tryDemo() {
+    setDemoState("loading");
+    loadDemoStyles();
+    try {
+      setDemo(await post("/api/rewrite", { url: "https://example.com", platforms: PLATFORMS, style: DEMO_STYLES[0] }));
+      setDemoState("idle");
+    } catch (e) {
+      setDemoState(e instanceof Error ? e.message : "失败了");
+    }
+  }
 
   function send(text: string) {
     if (!text.trim() || busy) return;
@@ -37,7 +53,7 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
 
   return (
     <div className={drawer ? "flex min-h-full flex-col gap-6" : "flex flex-col gap-6"}>
-      {messages.length === 0 && (
+      {messages.length === 0 && !demo && (
         <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={drawer ? "pt-8 text-center" : "pt-[12vh] text-center"}>
           <h1 className="text-3xl font-semibold tracking-tight">今天想发点什么?</h1>
           <p className="mt-2 text-sm text-muted">贴一个链接,或者说一个话题。{active ? `当前风格:${active.name}` : "尚未选择风格,将使用默认文风。"}</p>
@@ -47,8 +63,18 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
                 {s}
               </button>
             ))}
+            <Button variant="outline" size="sm" onClick={tryDemo} disabled={demoState === "loading"}>
+              {demoState === "loading" && <Loader2 className="size-3.5 animate-spin" />}试一下:示例风格 + example.com → 4 平台
+            </Button>
+            {demoState !== "idle" && demoState !== "loading" && <p className="text-xs text-red-500">{demoState}</p>}
           </div>
         </motion.section>
+      )}
+      {demo && (
+        <div className="flex flex-col gap-3">
+          <SourceCard source={demo.source} />
+          <PostTabs result={demo} />
+        </div>
       )}
 
       {messages.map((m) => (
@@ -78,7 +104,7 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && (e.preventDefault(), send(input))}
             rows={1}
-            placeholder="粘贴链接或描述话题…(Enter 发送)"
+            placeholder="粘贴链接或描述话题,例如 https://example.com …(Enter 发送)"
             className="max-h-40 min-h-9 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm outline-none"
           />
           <Button type="submit" size="icon" disabled={busy || !input.trim()} aria-label="发送">

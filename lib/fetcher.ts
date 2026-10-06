@@ -15,7 +15,7 @@ const UA =
 const cache = new Map<string, { at: number; value: Source }>();
 
 // ponytail: hostname check only; DNS-rebinding to private IPs needs a resolver-level guard.
-function assertPublic(u: URL) {
+export function assertPublic(u: URL) {
   if (!/^https?:$/.test(u.protocol)) throw new Error("Only http(s) URLs are supported");
   if (/^(localhost$|0\.|10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[)/.test(u.hostname))
     throw new Error("Private addresses are not allowed");
