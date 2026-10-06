@@ -32,7 +32,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 19. `67536b2` R19 — 4 new e2e (chat-drawer/settings/editor/styles-cloud), lib/types.ts schema tests, fix /api/compose mock mode, dependabot+stale.yml, docs/v0.2.0.md, lint 0 warnings
 20. `e816a40` R20 — chat.tsx mount tests (9), /api/embed + lib/embed.ts, /showcase demo, fix e2e/chat-drawer inert assertion, overall coverage 98.2%→99.8%
 21. `271a5b1` R21 — /search semantic-search demo (cosineSim + 64-dim vectors), chat.tsx catch test, 4 new e2e (search/styles-refine)
-22. `b02ddcc` R22 (tag) — /api/metrics counter (7 keys, file persistence), branches coverage 91.8%→97.7%, flake-proof chat-drawer e2e
+22. `b02ddcc` R22 — /api/metrics counter (7 keys, file persistence), branches coverage 91.8%→97.7%, flake-proof chat-drawer e2e
+23. `cf6cf1c` R23 (tag) — hand-rolled i18n zh/en (100+ keys, ServerLocale context, useSyncExternalStore hook), 15 components localised, cookie-based lang switch
 
 ## Known limits
 
