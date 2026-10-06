@@ -9,8 +9,8 @@ export default defineConfig({
       include: ["lib/**/*.ts"],
       exclude: ["lib/**/*.test.ts", "lib/db/**", "lib/mcp-server.ts"],
       reporter: ["text", "json-summary", "html"],
-      // Overall is ~55% (styles-* are browser/localStorage code, untested here), so enforce only on the pure-logic modules.
-      thresholds: { "lib/fetcher.ts": { lines: 90, branches: 80 }, "lib/http.ts": { lines: 90 }, "lib/export.ts": { lines: 70 } },
+      // Overall is ~65% (styles-db/styles-sync/ai.ts untested), so enforce only on the pure-logic modules.
+      thresholds: { "lib/fetcher.ts": { lines: 90, branches: 80 }, "lib/http.ts": { lines: 90 }, "lib/export.ts": { lines: 70 }, "lib/styles-store.ts": { lines: 90, branches: 90 }, "lib/cookie.ts": { lines: 90, branches: 90 }, "lib/utils.ts": { lines: 100 } },
     },
   },
 });
