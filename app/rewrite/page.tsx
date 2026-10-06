@@ -1,6 +1,7 @@
 "use client";
-import { Loader2 } from "lucide-react";
+import { Link2, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { EmptyState } from "@/components/empty-state";
 import { PlatformPicker } from "@/components/platform-picker";
 import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ export default function RewritePage() {
         抓取并改写
       </Button>
       {error && <p className="text-sm text-red-500">{error}</p>}
+      {!out && !loading && !error && <EmptyState icon={Link2} title="还没有改写结果" hint="贴一个链接,选好平台,点「抓取并改写」。" />}
       {out && (
         <>
           <SourceCard source={out.source} />

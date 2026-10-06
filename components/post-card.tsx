@@ -1,6 +1,7 @@
 "use client";
-import { Check, Copy, Download, Newspaper } from "lucide-react";
+import { Check, Copy, Download, FileText, Newspaper } from "lucide-react";
 import { useState } from "react";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { post as postJson } from "@/lib/http";
 import type { ExportBundle } from "@/lib/export";
@@ -35,7 +36,7 @@ export function PostTabs({ result }: { result: RewriteResult }) {
   const [copied, setCopied] = useState(false);
   const [wx, setWx] = useState(false);
   const post = result.posts[i];
-  if (!post) return null;
+  if (!post) return <EmptyState icon={FileText} title="没有生成任何平台的内容" hint="换个平台,或调整输入后重试。" />;
   const text = post.title ? `${post.title}\n\n${post.body}` : post.body;
 
   async function copy() {

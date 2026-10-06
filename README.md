@@ -1,92 +1,123 @@
+<div align="center">
+
 # MediaForge
 
-> 贴一个链接,或说一个话题。AI 用**你的**文风,写给公众号、X、小红书、B 站。复制,发布。
-> Paste a link or a topic. AI writes it in *your* voice for WeChat, X, Xiaohongshu and Bilibili. Copy, publish.
+**贴一个链接,或说一个话题。AI 用*你的*文风,写给公众号、X、小红书、B 站。复制,发布。**
 
-## 产品哲学 Philosophy
+Paste a link or a topic. AI writes it in *your* voice for WeChat, X, Xiaohongshu and Bilibili. Copy, publish.
 
-对标 [Vercel AI Chatbot](https://github.com/vercel/ai-chatbot) / ChatGPT:**对话是主界面,不是附加功能。**
+[![typecheck](https://img.shields.io/badge/typecheck-passing-brightgreen)](.github/workflows/ci.yml)
+[![test](https://img.shields.io/badge/test-15%20passed-brightgreen)](.github/workflows/ci.yml)
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](.github/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-| 原则 | 含义 |
+<!-- TODO: OG image / hero screenshot -->
+<img src="docs/assets/og.png" alt="MediaForge" width="720" />
+
+</div>
+
+> Badges 为静态占位。仓库推到 GitHub 后可换成 `https://github.com/<owner>/MediaForge/actions/workflows/ci.yml/badge.svg`。
+
+## Quick Start
+
+```bash
+pnpm install                      # 1. 安装(Node 22 + pnpm 10)
+cp .env.example .env.local        # 2. 复制环境变量(不填 key 也能跑:mock LLM)
+pnpm dev                          # 3. http://localhost:3000
+```
+
+4. **第一行玩起来**:打开首页 → 点「试一下:示例风格 + example.com → 4 平台」,无需任何 key;或粘贴 `https://x.com/<user>/status/<id>` 让 Agent 抓取并改写。
+
+<!-- TODO: demo GIF -->
+<img src="docs/assets/demo.gif" alt="demo" width="720" />
+
+## Features
+
+| | 特性 |
 |---|---|
-| **AI-native,不是套壳** | 抓取、改写、学风格都是 agent 的 *tool*;UI 只是工具结果的渲染层 |
-| **Chat-first** | 默认页就是对话。链接、话题、反馈,都是一句话 |
-| **极简** | 一个输入框 + 四个页面。没有设置迷宫 |
-| **风格是一等公民** | 风格 = 可学习、可修正、可版本化的 Agent,而非"语气下拉框" |
-| **保留素材** | 图片/视频原样随文返回,模型永不碰媒体 |
+| **对话优先** | 抓取、改写、学风格都是 agent 的 *tool*,UI 只渲染工具结果。<br/><!-- TODO screenshot: chat --> |
+| **改写模式** | 链接(X / 小红书 / B 站 / 公众号 / 任意文章)→ 抓取 → 选平台 → 一键复制,图片视频原样保留。<br/><!-- TODO screenshot: rewrite --> |
+| **创作模式** | 话题 + 参考链接 → 流式长文 → 适配多平台。<br/><!-- TODO screenshot: editor --> |
+| **风格 Agent** | 3–5 篇样本 → 语音特征 → 风格 Prompt;可用反馈或*你的手改*迭代,支持版本回滚与云同步。<br/><!-- TODO screenshot: styles --> |
+| **导出与 MCP** | 公众号内联 HTML、ZIP 打包;MediaForge 本身也是 MCP server,可被 Claude Code / Cursor / Codex 调用([docs/mcp.md](docs/mcp.md))。<br/><!-- TODO screenshot: export --> |
 
-## 特性 Features
+无 `ANTHROPIC_API_KEY` 时所有路由返回确定性 mock(响应里 `"llm": "mock"`,右下角有徽章),方便试用与测试。
 
-- **改写模式**:链接(X / 小红书 / B 站 / 公众号 / 任意文章)→ 抓取 → 选平台 → 一键复制,图片视频保留
-- **创作模式**:话题 + 若干参考链接 → 流式生成长文 → 适配多平台
-- **风格 Agent**:给 3–5 篇样本 → 提取语音特征 → 生成风格 Prompt → 用反馈或*你的手改*迭代
-- **全站可对话**:对话页内含完整闭环(抓取卡片、平台 Tab、复制按钮都是对话里的组件)
+## Architecture
 
-## 技术栈 Stack
+```
+┌──────────────┐   HTTPS    ┌──────────────────────────┐        ┌───────────────────────┐
+│   Browser    │ ─────────▶ │  Vercel (Next.js 15)     │ ─────▶ │ Anthropic API (LLM)   │
+│ React 19 UI  │ ◀───────── │  App Router + Route      │ ─────▶ │ Source sites / fxtwit │
+│ localStorage │  stream    │  Handlers (Node runtime) │ ─────▶ │ Firecrawl (optional)  │
+└──────────────┘            └────────────┬─────────────┘        └───────────────────────┘
+                                         │ DATABASE_URL (optional)
+                                         ▼
+                            ┌──────────────────────────┐
+                            │ Neon Postgres + Drizzle  │  风格云同步 / 版本
+                            └──────────────────────────┘
+```
+
+详见 [docs/architecture.md](docs/architecture.md)。
+
+## Tech Stack
 
 | 层 | 选型 |
 |---|---|
 | 框架 | Next.js 15 App Router · React 19 · TypeScript (strict) |
-| UI | Tailwind v4 (CSS-first, OKLCH tokens) · shadcn/ui 约定(`cva` + `cn`) · Motion · lucide |
-| AI | Vercel AI SDK v5(`useChat` / `streamText` / `generateObject` / tool-use)· Claude Sonnet 4.5 默认 |
-| 编排 | AI SDK v5 tool-use 循环(`stopWhen: stepCountIs`),不引入 LangGraph —— 见 [architecture](docs/architecture.md#编排选型) |
-| 抓取 | `@mozilla/readability` + `linkedom`;X 走 fxtwitter API;B 站走 view API |
-| 数据 | Neon Postgres + Drizzle(schema 已就绪,MVP 骨架用 localStorage 跑通) |
-| 部署 | Vercel |
+| UI | Tailwind v4 (OKLCH tokens) · shadcn 约定(`cva` + `cn`) · Motion · lucide |
+| AI | Vercel AI SDK v5(`useChat` / `streamText` / tool-use)· Claude Sonnet 4.5 默认;不引入 LangGraph |
+| 抓取 | `@mozilla/readability` + `linkedom`;X 走 fxtwitter;B 站走 view API;Firecrawl 兜底 |
+| 数据 | Neon Postgres + Drizzle(可选;默认 localStorage) |
+| 集成 | `@modelcontextprotocol/sdk`(stdio MCP server)· `jszip` |
+| 测试 / CI | Vitest · GitHub Actions |
 
-## 快速开始 Quick start
+## Configuration
 
-```bash
-pnpm install
-cp .env.example .env.local      # 填入 ANTHROPIC_API_KEY
-pnpm dev                        # http://localhost:3000
-```
+| 变量 | 必需 | 说明 |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | 否(缺省 mock) | 真实 LLM |
+| `ANTHROPIC_MODEL` | 否 | 默认 `claude-sonnet-4-5` |
+| `FIRECRAWL_API_KEY` | 否 | 登录墙页面兜底抓取 |
+| `DATABASE_URL` | 否 | Neon Postgres,启用风格云同步 |
+| `JINA_API_KEY` | 否 | **预留**,当前代码尚未读取 |
 
-**核心 Demo(30 秒)**:打开首页 → 粘贴 `https://x.com/<user>/status/<id>` → Agent 自动抓取并展示来源卡片 → 回复「小红书和公众号」→ 切 Tab → 点「复制」。
+## Deployment
 
-单独试抓取器:
+Vercel + Neon,约 5 分钟:
 
-```bash
-pnpm fetch-link https://x.com/<user>/status/<id>   # → {title, author, text, images[], videos[]}
-```
+1. 导入 GitHub 仓库到 Vercel(自动识别 Next.js)
+2. Neon 新建项目,`DATABASE_URL="…" pnpm db:push`
+3. 在 Vercel 配置上表环境变量,Deploy
+4. 访问 `/api/health` 确认 `llm` 字段
 
-## 目录 Layout
+完整说明:[docs/deployment.md](docs/deployment.md)。
 
-```
-app/            页面(/ 对话 · /rewrite · /editor · /styles)与 app/api/* Route Handlers
-components/     chat · post-card · platform-picker · nav · ui/button
-lib/            ai.ts(prompt+LLM 调用) · fetcher.ts · types.ts · platforms.ts · styles-store.ts · db/schema.ts
-scripts/        link-fetcher.ts(CLI)
-docs/           architecture · product-spec · style-agent · api · data-model · ui-style-guide
-```
+## Project Status
 
-## 文档 Docs
+**v0.1.0** — 5 页面 · 13 个 API · MCP server · mock LLM · 演示数据 · 15 个单测。
 
-[architecture](docs/architecture.md) · [product-spec](docs/product-spec.md) · [style-agent](docs/style-agent.md) · [api](docs/api.md) · [data-model](docs/data-model.md) · [ui-style-guide](docs/ui-style-guide.md)
+Roadmap:
+- [ ] 真实 key 下的端到端验证与 prompt 调优
+- [ ] 登录态抓取成功率(只能尽力而为)
+- [ ] Jina Reader 抓取后端
+- [ ] 平台发布自动化
+- [ ] e2e 测试、Storybook
 
-## 当前状态 Status
+文档:[architecture](docs/architecture.md) · [product-spec](docs/product-spec.md) · [style-agent](docs/style-agent.md) · [api](docs/api.md) · [data-model](docs/data-model.md) · [mcp](docs/mcp.md) · [ui-style-guide](docs/ui-style-guide.md)
 
-骨架 + 端到端骨架。已跑通:
-- 5 页面 / 12 个 API 路由(对话、改写、创作、风格、导出、全局、风格云同步)
-- 全局 ⌘K 抽屉 / 公众号内联 HTML / ZIP 导出 / jszip 浏览器打包
-- Firecrawl 兜底抓取 / 小红书 cookie 配置
-- 风格 Agent:本地存储 + Postgres 可选同步 + 版本回滚(不绕过 MCP)
-- **MCP server**:Claude Code / Cursor / Codex 可以直接调用,无 key 时有确定性 mock
-- Mock LLM:无 `ANTHROPIC_API_KEY` 时所有路由仍返回合理响应(`"llm": "mock"` 标识)
-- Round 5 新增演示数据(`/styles`「加载演示风格」、对话页「试一下」)+ LLM 模式徽章(右下角,`/api/health`);`pnpm test` 跑 vitest
+## Contributing
 
-未做(见各文档 Roadmap):真对话 demo(填 key 即可)、登录态抓取成功率优化(只能尽力而为)、第三方平台发布自动化、Storybook、e2e tests。
+欢迎 PR。`pnpm typecheck && pnpm test && pnpm build` 通过即可;详见 [CONTRIBUTING](.github/CONTRIBUTING.md)。
 
-## MCP(MediaForge 作为 AI Agent 工具)
+## License
 
-[docs/mcp.md](docs/mcp.md) — 完整接入 Claude Code / Cursor / Codex。**无 key 也能跑**(mock LLM)。
+[MIT](LICENSE)
 
-```bash
-pnpm mcp              # stdio MCP server,stderr: [mediaforge-mcp] ready (llm: mock)
-```
+## Acknowledgments
 
-工具:`rewrite_url`、`compose_post`、`learn_style`、`refine_style`。返回 JSON 顶层有 `"llm": "mock"|"anthropic"` 让调用方判断真假。
-
-## 开发分工 Workflow
-
-Claude Code 负责需求、架构、关键环节把控与验收;琐碎实现(样板、注释、测试、重命名)可交给 DeepSeek 等低成本模型。
+- [Firecrawl](https://github.com/mendableai/firecrawl) — 登录墙页面兜底抓取(可选集成)
+- [Jina Reader](https://github.com/jina-ai/reader) · [Unstructured](https://github.com/Unstructured-IO/unstructured) — 调研参考(见 [research/](research/MEDIAFORGE_OPEN_SOURCE_LANDSCAPE.md)),尚未作为依赖接入
+- [JSZip](https://github.com/Stuk/jszip) — 浏览器端 ZIP 打包
+- [Model Context Protocol SDK](https://github.com/modelcontextprotocol/typescript-sdk) — MCP server
+- [Mozilla Readability](https://github.com/mozilla/readability) · [linkedom](https://github.com/WebReflection/linkedom) · [Vercel AI SDK](https://github.com/vercel/ai) · [Vercel AI Chatbot](https://github.com/vercel/ai-chatbot)(产品形态参考)

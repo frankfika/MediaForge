@@ -1,7 +1,8 @@
 "use client";
 import { useCompletion } from "@ai-sdk/react";
-import { Loader2 } from "lucide-react";
+import { Loader2, PenLine } from "lucide-react";
 import { useState } from "react";
+import { EmptyState } from "@/components/empty-state";
 import { PlatformPicker } from "@/components/platform-picker";
 import { PostTabs } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,7 @@ export default function EditorPage() {
       </Button>
       {error && <p className="text-sm text-red-500">{error.message}</p>}
 
+      {!draft && !isLoading && !error && <EmptyState icon={PenLine} title="还没有初稿" hint="写下话题,可附参考链接,点「生成初稿」。" />}
       {(draft || isLoading) && (
         <>
           <textarea value={draft} onChange={(e) => setEdited(e.target.value)} rows={16} className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed outline-none focus:border-accent" />
