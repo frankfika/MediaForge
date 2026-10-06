@@ -4,7 +4,8 @@ import { z } from "zod";
 const getDb = vi.fn();
 vi.mock("./db/client", () => ({ getDb: () => getDb() }));
 
-import { addVersion, createStyle, deleteStyle, getStyle, listStyles, rollbackStyle, styleRoute } from "./styles-db";
+import { addVersion, createStyle, deleteStyle, duplicateStyle, getStyle, listStyles, rollbackStyle, styleRoute } from "./styles-db";
+import { POST } from "@/app/api/styles/[id]/duplicate/route";
 
 /** Chainable, thenable fake: every builder call returns itself; awaiting pops the next queued result. */
 function fakeDb(results: unknown[]) {
@@ -90,6 +91,36 @@ describe("deleteStyle", () => {
   it("false when absent", async () => expect(await deleteStyle(fakeDb([[]]).db, "u", "s1")).toBe(false));
 });
 
+describe("duplicateStyle", () => {
+  it("null when source is missing", async () => expect(await duplicateStyle(fakeDb([[]]).db, "u", "s1")).toBeNull());
+  it("copies prompt/features under '{name} (copy)' via createStyle", async () => {
+    const { db, calls } = fakeDb([
+      [S], // getStyle: style row
+      [V(2), V(1)], // getStyle: versions
+      undefined, // createStyle: insert user
+      [{ ...S, id: "s2", name: "N (copy)", currentVersion: 1 }], // insert style
+      undefined, // insert version 1 (prompt = src.prompt)
+      [{ ...S, id: "s2", name: "N (copy)", currentVersion: 1 }], // getStyle reload: style
+      [{ ...V(2), styleId: "s2" }], // getStyle reload: versions
+    ]);
+    const out = await duplicateStyle(db, "u", "s1");
+    expect(out).toMatchObject({ id: "s2", name: "N (copy)", prompt: "p2" });
+    expect(calls.filter((c) => c === "insert")).toHaveLength(3);
+  });
+  it("honours a caller-supplied name", async () => {
+    const { db } = fakeDb([
+      [S],
+      [V(1)],
+      undefined,
+      [{ ...S, id: "s2", name: "Mine", currentVersion: 1 }],
+      undefined,
+      [{ ...S, id: "s2", name: "Mine", currentVersion: 1 }],
+      [{ ...V(2), styleId: "s2" }],
+    ]);
+    expect((await duplicateStyle(db, "u", "s1", "Mine"))?.name).toBe("Mine");
+  });
+});
+
 describe("addVersion", () => {
   it("appends max+1 and moves current", async () => {
     const { db, calls } = fakeDb([[S], [{ top: 5 }], [V(2)], undefined, undefined, [{ ...S, currentVersion: 6 }], [V(6)]]);
@@ -169,5 +200,50 @@ describe("styleRoute: edge cases", () => {
     expect(seen).toBe("");
     const r = await styleRoute(null, async () => Promise.reject("x"))(post(), { params: Promise.resolve({}) });
     expect((await r.json()).error).toBe("Database error");
+  });
+  it("body-less POST parses as {} for all-optional schemas", async () => {
+    getDb.mockReturnValue({});
+    const r = await styleRoute(z.object({ name: z.string().optional() }), async (c) => ({ ok: c.body }))(
+      new Request("http://x", { method: "POST" }),
+      { params: Promise.resolve({}) },
+    );
+    expect(r.status).toBe(200);
+    expect(await r.json()).toEqual({ ok: {} });
+  });
+});
+
+describe("POST /api/styles/[id]/duplicate route", () => {
+  const ctx = { params: Promise.resolve({ id: "s1" }) };
+  const post = (body?: unknown) => new Request("http://x", { method: "POST", ...(body !== undefined && { body: JSON.stringify(body) }) });
+
+  it("503 NO_DB without DATABASE_URL", async () => {
+    getDb.mockReturnValue(null);
+    const r = await POST(post(), ctx);
+    expect(r.status).toBe(503);
+    expect((await r.json()).code).toBe("NO_DB");
+  });
+  it("404 when the source style is missing", async () => {
+    getDb.mockReturnValue(fakeDb([[]]).db);
+    expect((await POST(post(), ctx)).status).toBe(404);
+  });
+  it("400 when the optional name is invalid", async () => {
+    getDb.mockReturnValue(fakeDb([[]]).db);
+    expect((await POST(post({ name: 42 }), ctx)).status).toBe(400);
+  });
+  it("200 duplicates with an explicit name", async () => {
+    getDb.mockReturnValue(
+      fakeDb([
+        [S],
+        [V(2)],
+        undefined,
+        [{ ...S, id: "s2", name: "Clone", currentVersion: 1 }],
+        undefined,
+        [{ ...S, id: "s2", name: "Clone", currentVersion: 1 }],
+        [{ ...V(2), styleId: "s2" }],
+      ]).db,
+    );
+    const r = await POST(post({ name: "Clone" }), ctx);
+    expect(r.status).toBe(200);
+    expect(await r.json()).toMatchObject({ id: "s2", name: "Clone", prompt: "p2" });
   });
 });

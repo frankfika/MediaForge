@@ -1,8 +1,8 @@
-/** Minimal i18n: a typed dictionary, `t(key, locale, params)`, and cookie helpers. zh is the source of truth; en and ja must have the same keys. */
-export const LOCALES = ["zh", "en", "ja"] as const;
+/** Minimal i18n: a typed dictionary, `t(key, locale, params)`, and cookie helpers. zh is the source of truth; en, ja and ko must have the same keys. */
+export const LOCALES = ["zh", "en", "ja", "ko"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const LOCALE_COOKIE = "mediaforge.locale";
-export const HTML_LANG: Record<Locale, string> = { zh: "zh-CN", en: "en", ja: "ja" };
+export const HTML_LANG: Record<Locale, string> = { zh: "zh-CN", en: "en", ja: "ja", ko: "ko" };
 
 export const zh = {
   "nav.chat": "对话",
@@ -73,6 +73,7 @@ export const zh = {
   "lang.zh": "中文",
   "lang.en": "English",
   "lang.ja": "日本語",
+  "lang.ko": "한국어",
 
   "error.title": "出了点小问题",
   "error.fallback": "页面加载失败。",
@@ -250,6 +251,7 @@ export const en: Record<Key, string> = {
   "lang.zh": "中文",
   "lang.en": "English",
   "lang.ja": "日本語",
+  "lang.ko": "한국어",
 
   "error.title": "Something went wrong",
   "error.fallback": "The page failed to load.",
@@ -426,6 +428,7 @@ export const ja: Record<Key, string> = {
   "lang.zh": "中文",
   "lang.en": "English",
   "lang.ja": "日本語",
+  "lang.ko": "한국어",
 
   "error.title": "ちょっとした問題が発生しました",
   "error.fallback": "ページの読み込みに失敗しました。",
@@ -533,7 +536,184 @@ export const ja: Record<Key, string> = {
   "styles.empty": "スタイルはまだありません。好きな記事を数篇貼り付けて、AI に学習させましょう。",
 };
 
-const DICTS: Record<Locale, Record<Key, string>> = { zh, en, ja };
+export const ko: Record<Key, string> = {
+  "nav.chat": "채팅",
+  "nav.rewrite": "다시 쓰기",
+  "nav.editor": "작성",
+  "nav.styles": "스타일",
+  "nav.search": "검색",
+  "nav.settings": "설정",
+  "nav.showcase": "컴포넌트",
+  "nav.activeStyle": "현재 스타일",
+  "nav.defaultStyle": "기본 스타일",
+
+  "platform.wechat": "WeChat 공중호",
+  "platform.x": "X (구 트위터)",
+  "platform.xhs": "샤오홍슈",
+  "platform.bilibili": "bilibili",
+
+  "common.failed": "실패",
+  "common.retry": "다시 시도",
+  "common.close": "닫기",
+
+  "chat.title": "오늘은 무엇을 올릴까요?",
+  "chat.subActive": "링크를 붙여 넣거나 주제를 말해 주세요. 현재 스타일: {name}",
+  "chat.subNone": "링크를 붙여 넣거나 주제를 말해 주세요. 스타일이 선택되지 않아 기본 문체로 작성합니다.",
+  "chat.s1": "트윗 / 샤오홍슈 / bilibili 링크를 붙여 넣으면 다시 써 드립니다",
+  "chat.s2": "「AI 코딩 어시스턴트의 다음 단계」에 대한 WeChat 공중호 기사를 써 줘",
+  "chat.s3": "이 기사를 샤오홍슈 스타일로 바꿔 줘",
+  "chat.s1Query": "https://example.com 을 샤오홍슈 스타일로 다시 써 줘",
+  "chat.s2Query": "「AI 코딩 어시스턴트의 다음 단계」에 대한 WeChat 공중호 기사를 써 줘",
+  "chat.s3Query": "이 기사를 샤오홍슈 스타일로 바꿔 줘",
+  "chat.demo": "체험: 데모 스타일 + example.com → 4개 플랫폼",
+  "chat.fetchFailed": "가져오기 실패: {error}",
+  "chat.fetching": "링크를 가져오는 중…",
+  "chat.rewriteFailed": "다시 쓰기 실패: {error}",
+  "chat.rewriting": "다시 쓰는 중…",
+  "chat.thinking": "생각 중…",
+  "chat.placeholder": "링크를 붙여 넣거나 주제를 입력하세요. 예: https://example.com …(Enter로 전송)",
+  "chat.send": "전송",
+
+  "drawer.label": "전역 채팅",
+  "drawer.title": "MediaForge 어시스턴트",
+
+  "src.counts": "이미지 {images}개 · 동영상 {videos}개",
+  "post.emptyTitle": "어떤 플랫폼 콘텐츠도 생성되지 않았습니다",
+  "post.emptyHint": "플랫폼을 바꾸거나 입력을 조정한 뒤 다시 시도해 주세요.",
+  "post.copied": "복사됨",
+  "post.copy": "복사",
+  "post.copyWechat": "WeChat 공중호용으로 복사",
+  "post.video": "동영상 ↗",
+
+  "xhs.before": "샤오홍슈 노트 중 일부는 로그인이 필요합니다. 본문을 가져오지 못했다면 ",
+  "xhs.link": "설정 페이지",
+  "xhs.after": "에서 쿠키를 입력하세요(리스크 컨트롤 우회는 보장되지 않습니다).",
+
+  "settings.title": "설정",
+  "settings.theme": "테마",
+  "settings.language": "언어",
+  "settings.cookie": "샤오홍슈 쿠키",
+  "settings.optional": "(선택)",
+  "settings.save": "저장",
+  "settings.saved": "저장됨",
+  "settings.cookieHelp":
+    "로그인된 브라우저에서 샤오홍슈를 열고, 개발자 도구 → Network → 아무 요청의 Cookie 헤더를 통째로 한 줄 복사해 여기에 붙여 넣으세요. 쿠키는 이 브라우저에만 저장되며(base64 인코딩은 난독화일 뿐 암호화가 아님), 가져올 때는 샤오홍슈 도메인으로 가는 요청에만 함께 전송됩니다.",
+  "settings.cookieHonest":
+    "정직한 안내: 쿠키가 있다고 해서 샤오홍슈의 리스크 컨트롤을 반드시 넘을 수 있는 것은 아닙니다. 로그인이 필요한 일부 노트에 대한 또 하나의 방법일 뿐입니다. 실패하면 본문을 직접 붙여 넣으세요.",
+  "theme.light": "라이트",
+  "theme.dark": "다크",
+  "theme.system": "시스템 설정 따르기",
+  "lang.zh": "中文",
+  "lang.en": "English",
+  "lang.ja": "日本語",
+  "lang.ko": "한국어",
+
+  "error.title": "문제가 발생했습니다",
+  "error.fallback": "페이지를 불러오지 못했습니다.",
+  "notFound.text": "이 페이지는 존재하지 않습니다.",
+  "notFound.home": "홈으로 돌아가기",
+
+  "rewrite.title": "다시 쓰기",
+  "rewrite.placeholder": "https://example.com(데모, 항상 접속 가능)/ x.com / 샤오홍슈 / bilibili / WeChat 공중호",
+  "rewrite.run": "가져와서 다시 쓰기",
+  "rewrite.emptyTitle": "아직 다시 쓴 결과가 없습니다",
+  "rewrite.emptyHint": "링크를 붙이고 플랫폼을 고른 뒤「가져와서 다시 쓰기」를 클릭하세요.",
+
+  "editor.title": "작성",
+  "editor.topic": "주제 또는 한 줄 브리프",
+  "editor.links": "참고 링크(선택, 공백 또는 줄바꿈으로 구분, 최대 5개)",
+  "editor.generate": "초안 생성",
+  "editor.emptyTitle": "아직 초안이 없습니다",
+  "editor.emptyHint": "주제를 적고 필요하면 참고 링크를 붙인 뒤「초안 생성」을 클릭하세요.",
+  "editor.adapt": "플랫폼에 맞추기",
+  "editor.learn": "내 수정에서 학습",
+  "editor.needStyle": "먼저「스타일」페이지에서 스타일을 만들고 선택하세요",
+  "editor.styleUpdated": "스타일이 v{version}으로 업데이트됐습니다: {changelog}",
+
+  "search.title": "시맨틱 검색",
+  "search.query": "쿼리",
+  "search.placeholder": "쿼리 입력",
+  "search.note":
+    "데모에서는 모의 벡터(결정적 해시이며 실제 시맨틱이 아님)를 사용하며, 순위는 흐름을 보여주기 위한 것입니다. 실제 임베딩 모델을 연결하면 시맨틱 순위가 됩니다.",
+
+  "showcase.title": "컴포넌트 미리보기",
+  "showcase.search": "시맨틱 검색 demo →",
+
+  "firstRun.title": "MediaForge에 오신 것을 환영합니다!",
+  "firstRun.subtitle": "세 단계로 바로 시작하기",
+  "firstRun.step1.title": "데모 스타일 불러오기",
+  "firstRun.step1.desc": "「데모 스타일 불러오기」를 클릭하고 AI가 당신의 목소리를 배우는 모습을 확인하세요.",
+  "firstRun.step2.title": "시맨틱 검색 사용해 보기",
+  "firstRun.step2.desc": "샘플 문서 5개를 검색해 코사인 순위를 확인하세요.",
+  "firstRun.step3.title": "컴포넌트 미리보기 보기",
+  "firstRun.step3.desc": "/showcase에는 Button / PostCard / Chat / LlmModeBadge 등 6개의 컴포넌트가 있습니다.",
+  "firstRun.step4.title": "MCP 서버 연결",
+  "firstRun.step4.desc": "Claude Code / Cursor / Codex에서 mediaforge 도구를 호출할 수 있습니다.",
+  "firstRun.dismiss": "알겠습니다",
+
+  "styles.title": "스타일",
+  "styles.loadDemo": "데모 스타일 불러오기",
+  "styles.storage": "저장소",
+  "styles.local": "로컬",
+  "styles.cloud": "클라우드 (Postgres)",
+  "styles.sync": "지금 동기화",
+  "styles.gotIt": "알겠습니다",
+  "styles.pending": "클라우들에 아직 업로드되지 않은 로컬 스타일이 {n}개 있습니다({names}).",
+  "styles.nameSep": ", ",
+  "styles.upload": "클라우드에 업로드",
+  "styles.later": "나중에",
+  "styles.compare": "비교",
+  "styles.cancel": "취소",
+  "styles.compareWith": "v{base}와 비교",
+  "styles.compareFailed": "비교에 실패했습니다",
+  "styles.current": "현재",
+  "styles.rollbackTo": "이 버전으로 롤백",
+  "styles.rollbackFailed": "롤백에 실패했습니다",
+  "styles.versionCompare": "버전 비교",
+  "styles.lines": "줄",
+  "styles.vocabulary": "특징어",
+  "styles.devices": "수사법",
+  "styles.taboos": "금기",
+  "styles.noFeatures": "이 스타일에는 특징 데이터가 없습니다.",
+  "styles.avgLen": "평균 문장 길이",
+  "styles.rhythm": "리듬",
+  "styles.lastRefine": "최근 수정: {log}",
+  "styles.none": "아직 없음",
+  "styles.cloudOnly": "수정 기록은 클라우드 스타일만 저장합니다",
+  "styles.judgeText": "테스트할 텍스트를 붙여 넣거나 위의 예시를 클릭하세요",
+  "styles.judgeRefs": "참고 샘플(선택, 여러 개는 ---로 구분). 비워 두면 스타일 특징에서 합성합니다.",
+  "styles.judgeRun": "테스트 시작",
+  "signal.sentenceLength": "문장 길이 분포",
+  "signal.vocabularyOverlap": "어휘 중복",
+  "signal.rhythmMatch": "리듬",
+  "signal.sentenceCountMatch": "문장 수",
+  "signal.tabooCompliance": "금기 준수",
+  "styles.transfer": "가져오기 / 내보내기",
+  "styles.exportAll": "모두 내보내기",
+  "styles.importPlaceholder": "스타일 JSON 붖여넞기",
+  "styles.importLabel": "스타일 JSON 가져오기",
+  "styles.import": "가져오기",
+  "styles.imported": "스타일 {n}개를 가져왔습니다",
+  "styles.importNone": "가져올 스타일이 없습니다(JSON이 유효하지 않거나 필드가 부족합니다)",
+  "styles.inUse": "사용 중",
+  "styles.use": "사용",
+  "styles.collapse": "접기",
+  "styles.expand": "펼치기",
+  "styles.judge": "테스트",
+  "styles.export": "내보내기",
+  "styles.delete": "삭제",
+  "styles.sentenceLen": "문장 길이 ≈ {n}",
+  "styles.viewPrompt": "스타일 프롬프트 보기",
+  "styles.history": "버전 기록",
+  "styles.feedback": "어디가 다른가요? 예: 「너무 격식 있어요. 짧은 문장과 반문을 더 써 주세요」",
+  "styles.refine": "수정",
+  "styles.namePlaceholder": "스타일 이름, 예: 「내 공중호」",
+  "styles.samplesPlaceholder": "샘플 3~5개를 붙여 넣으세요: 기사 링크 또는 본문.\n여러 개는 ---만 있는 줄로 구분하세요.",
+  "styles.learn": "이 스타일 학습",
+  "styles.empty": "아직 스타일이 없습니다. 좋아하는 기사 몇 편을 붙여 넣어 AI에게 학습시켜 보세요.",
+};
+
+const DICTS: Record<Locale, Record<Key, string>> = { zh, en, ja, ko };
 
 export const isLocale = (v: unknown): v is Locale => LOCALES.includes(v as Locale);
 

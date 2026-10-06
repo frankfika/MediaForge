@@ -14,7 +14,7 @@ const DEFAULT_USER = "00000000-0000-4000-8000-000000000001";
 const toVersion = (v: typeof styleVersions.$inferSelect): StyleVersion => ({
   version: v.version,
   prompt: v.prompt,
-  features: v.features as StyleVersion["features"],
+  features: v.features == null ? undefined : (v.features as StyleVersion["features"]),
   changelog: v.changelog,
   createdAt: v.createdAt.toISOString(),
 });
@@ -72,6 +72,13 @@ export async function deleteStyle(db: Db, userId: string, id: string) {
   return gone.length > 0;
 }
 
+/** Copy a style into a fresh uuid with "{name} (copy)" (or a caller-supplied name). Null when the source is missing. */
+export async function duplicateStyle(db: Db, userId: string, id: string, name?: string): Promise<ApiStyle | null> {
+  const src = await getStyle(db, userId, id);
+  if (!src) return null;
+  return createStyle(db, userId, { name: name ?? `${src.name} (copy)`, prompt: src.prompt, features: src.features ?? undefined });
+}
+
 /** Append-only: always max(version)+1, even after a rollback, so history is never overwritten. */
 export async function addVersion(db: Db, userId: string, id: string, v: { prompt: string; changelog: string[] }): Promise<ApiStyle | null> {
   const ok = await db.transaction(async (tx) => {
@@ -121,7 +128,8 @@ export const styleRoute =
     if (!z.string().uuid().safeParse(raw).success) return Response.json({ error: "x-user-id must be a uuid" }, { status: 400 });
     let body: unknown;
     if (schema) {
-      const parsed = schema.safeParse(await req.json().catch(() => null));
+      // body-less POSTs (e.g. duplicate) parse as {}; invalid JSON still fails zod for required-field schemas
+      const parsed = schema.safeParse(await req.json().catch(() => ({})));
       if (!parsed.success) return Response.json({ error: parsed.error.issues[0]?.message ?? "Bad request" }, { status: 400 });
       body = parsed.data;
     }
