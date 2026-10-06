@@ -24,11 +24,12 @@ import type { Style, StyleVersion } from "@/lib/types";
 
 /** Storage mode switch, manual sync, degrade warning and the inline "upload local styles" prompt. */
 function StorageBar() {
+  const t = useT();
   const { mode, busy, warning, pending, migrationDismissed, dismissWarning, dismissMigration } = useStylesDb();
   return (
     <div className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-card p-3 text-sm">
       <div className="flex items-center gap-2">
-        <span className="text-xs text-muted">存储</span>
+        <span className="text-xs text-muted">{t("styles.storage")}</span>
         {(["local", "db"] as const).map((m) => (
           <Button key={m} size="sm" variant={mode === m ? "primary" : "outline"} disabled={busy} onClick={() => setMode(m)}>
             {m === "local" ? "本地" : "云端 (Postgres)"}
@@ -64,6 +65,7 @@ function StorageBar() {
 }
 
 function History({ id, current, onRollback }: { id: string; current: number; onRollback: (v: number) => void }) {
+  const t = useT();
   const [versions, setVersions] = useState<StyleVersion[] | null>(null);
   const [base, setBase] = useState<number | null>(null);
   const [cmp, setCmp] = useState<{ from: number; to: number; diff: StyleDiff } | { error: string } | null>(null);
@@ -100,7 +102,7 @@ function History({ id, current, onRollback }: { id: string; current: number; onR
                 </Button>
               )}
               {v.version === current ? (
-                <span className="text-muted">当前</span>
+                <span className="text-muted">{t("styles.current")}</span>
               ) : (
                 <Button size="sm" variant="outline" className="h-6 px-2 text-xs" onClick={() => onRollback(v.version)}>
                   回滚到此版本
@@ -173,6 +175,7 @@ const FEATURE_ROWS = [
 
 /** Read-only detail: features cards + latest refine changelog (cloud history only; samples are not stored). */
 function StyleDetail({ style, cloud }: { style: Style; cloud: boolean }) {
+  const t = useT();
   const [log, setLog] = useState<string | null>(null);
   useEffect(() => {
     if (!cloud) return;
@@ -190,11 +193,11 @@ function StyleDetail({ style, cloud }: { style: Style; cloud: boolean }) {
         {f ? (
           <>
             <div className="rounded-lg border border-line p-3 text-xs">
-              <p className="text-muted">平均句长</p>
+              <p className="text-muted">{t("styles.avgLen")}</p>
               <p className="mt-1 text-lg font-semibold">{f.avgSentenceLength}</p>
             </div>
             <div className="rounded-lg border border-line p-3 text-xs">
-              <p className="text-muted">节奏</p>
+              <p className="text-muted">{t("styles.rhythm")}</p>
               <p className="mt-1">{f.rhythm}</p>
             </div>
             {FEATURE_ROWS.map(([k, label]) => (
@@ -215,10 +218,12 @@ function StyleDetail({ style, cloud }: { style: Style; cloud: boolean }) {
             ))}
           </>
         ) : (
-          <p className="text-xs text-muted sm:col-span-2">这个风格没有特征数据。</p>
+          <p className="text-xs text-muted sm:col-span-2">{t("styles.noFeatures")}</p>
         )}
       </div>
-      <p className="mt-2 text-xs text-muted">最近修正:{log ?? (cloud ? "暂无" : "仅云端风格记录修正历史")}</p>
+      <p className="mt-2 text-xs text-muted">
+        {t("styles.lastRefine", { log: log ?? (cloud ? t("styles.none") : t("styles.cloudOnly")) })}
+      </p>
     </motion.div>
   );
 }
@@ -303,6 +308,7 @@ function JudgePanel({ style }: { style: Style }) {
 
 /** Export all / paste-to-import. Import upserts by id (same id overwrites), so re-importing never duplicates. */
 function TransferBar({ styles }: { styles: Style[] }) {
+  const t = useT();
   const [text, setText] = useState("");
   const [msg, setMsg] = useState("");
   async function run() {
@@ -314,7 +320,7 @@ function TransferBar({ styles }: { styles: Style[] }) {
   return (
     <div className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-card p-3 text-sm">
       <div className="flex items-center gap-2">
-        <span className="text-xs text-muted">导入/导出</span>
+        <span className="text-xs text-muted">{t("styles.transfer")}</span>
         <Button
           size="sm"
           variant="outline"
@@ -347,6 +353,7 @@ function TransferBar({ styles }: { styles: Style[] }) {
 }
 
 function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
+  const t = useT();
   const { inCloud } = useStylesDb();
   const [feedback, setFeedback] = useState("");
   const [busy, setBusy] = useState(false);
@@ -395,12 +402,12 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
       {judging && <JudgePanel style={style} />}
       <AnimatePresence initial={false}>{open && <StyleDetail style={style} cloud={inCloud(style.id)} />}</AnimatePresence>
       <details className="mt-2">
-        <summary className="cursor-pointer text-xs text-muted">查看风格 Prompt</summary>
+        <summary className="cursor-pointer text-xs text-muted">{t("styles.viewPrompt")}</summary>
         <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed">{style.prompt}</p>
       </details>
       {inCloud(style.id) && (
         <details className="mt-2">
-          <summary className="cursor-pointer text-xs text-muted">版本历史</summary>
+          <summary className="cursor-pointer text-xs text-muted">{t("styles.history")}</summary>
           <History
             id={style.id}
             current={style.version}
@@ -483,7 +490,7 @@ export default function StylesPage() {
       {styles.map((s) => (
         <StyleCard key={s.id} style={s} isActive={active?.id === s.id} />
       ))}
-      {styles.length === 0 && <p className="text-center text-sm text-muted">还没有风格。贴几篇你喜欢的文章,让 AI 学一学。</p>}
+      {styles.length === 0 && <p className="text-center text-sm text-muted">{t("styles.empty")}</p>}
     </div>
   );
 }

@@ -41,3 +41,23 @@ test("cookie locale survives a full page reload", async ({ page, context }) => {
   await expect(other.locator("html")).toHaveAttribute("lang", "en");
   await expect(other.getByRole("heading", { name: "Styles" })).toBeVisible();
 });
+
+test("/styles page hardcoded strings move to en", async ({ page }) => {
+  // seed zh: load demo styles, then visit settings and switch
+  await page.goto("/styles");
+  await page.getByRole("button", { name: "加载演示风格" }).click();
+  await expect(page.getByText("存储", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "风格" })).toBeVisible();
+
+  // switch to en via settings page
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "English", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+
+  // back to /styles: zh headings gone, en headings present
+  await page.goto("/styles");
+  await expect(page.getByRole("heading", { name: "Styles" })).toBeVisible();
+  await expect(page.getByText("Storage", { exact: true })).toBeVisible();
+  await expect(page.getByText("Import / Export", { exact: true })).toBeVisible();
+  await expect(page.getByText("存储", { exact: true })).toHaveCount(0);
+});
