@@ -34,7 +34,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 21. `271a5b1` R21 — /search semantic-search demo (cosineSim + 64-dim vectors), chat.tsx catch test, 4 new e2e (search/styles-refine)
 22. `b02ddcc` R22 — /api/metrics counter (7 keys, file persistence), branches coverage 91.8%→97.7%, flake-proof chat-drawer e2e
 23. `cf6cf1c` R23 — hand-rolled i18n zh/en (100+ keys, ServerLocale context, useSyncExternalStore hook), 15 components localised, cookie-based lang switch
-24. `82101c9` R24 (tag) — lib/i18n.test.ts (23 tests, anti-miss zh/en key parity), e2e/i18n.spec.ts (2 tests: zh↔en toggle + cookie survives reload), fix styles page hardcoded heading, fix DICTS[unknown-locale] crash
+24. `82101c9` R24 — lib/i18n.test.ts (23 tests, anti-miss zh/en key parity), e2e/i18n.spec.ts (2 tests: zh↔en toggle + cookie survives reload), fix styles page hardcoded heading, fix DICTS[unknown-locale] crash
+25. `d9973e9` R25 (tag) — i18n sweep on /styles page (11 hardcoded zh strings → t(), useT() on 4 inner components), e2e/i18n.spec.ts +1 case
 
 ## Known limits
 
