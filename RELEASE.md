@@ -43,7 +43,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 30. `e7ea085` R31 — chat suggestion chips: label (chat.sN) vs real query (new chat.sNQuery, zh placeholder-style / en imperative); chat.tsx functions 90.9%→100%; scripts/push.sh (secret-leak + remote/tag checks, pushes main + tag, --check dry run) + `pnpm push` + README First push section.
 31. `5f1b8c3` R32 — components/onboarding.tsx + 12 i18n keys (firstRun.*): first-visit card on /showcase with 4 steps (styles/search/showcase/docs/mcp.md), localStorage flag `mediaforge.visited` with SSR-safe hydration gate, 4 unit tests + 1 e2e (dismiss survives refresh).
 32. `896f8a1` R33 — onboarding step 4 link fixed: serve docs/mcp.md as public/mcp-guide.md so Next.js serves it. branches coverage 96.83%→98.01% via +6 unit tests in i18n/embed/export/styles-sync (no source changes).
-33. `1356727` R34 (tag) — i18n gains a third locale (ja, ~170 keys, typed key parity), Playwright reporter adds 'github' in CI for PR annotations, e2e artifact uses 'if: always()' to always upload the report, new docs/release-notes.md (中文 user-story release post), README links it.
+33. `1356727` R34 — i18n gains a third locale (ja, ~170 keys, typed key parity), Playwright reporter adds 'github' in CI for PR annotations, e2e artifact uses 'if: always()' to always upload the report, new docs/release-notes.md (中文 user-story release post), README links it.
+34. `4326318` R35-R37 (tag) — i18n adds fourth locale (ko, 157 keys, parity-tested); /api/styles/[id]/duplicate (cloud path, returns new uuid with 'name (copy)'); bug fix in toVersion() — features from drizzle jsonb is null | undefined, normalise to undefined before cast (otherwise ApiStyle.features: required rejects null).
 
 ## Known limits
 
