@@ -30,7 +30,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 17. `a961643` R18a — apply Prettier across the repo (59 files reformatted)
 18. `6472119` R18 — llm.ts branch coverage 100%, `pnpm test:xhs` real-network script, docs/xhs-cookie-test.md, CHANGELOG Unreleased
 19. `67536b2` R19 — 4 new e2e (chat-drawer/settings/editor/styles-cloud), lib/types.ts schema tests, fix /api/compose mock mode, dependabot+stale.yml, docs/v0.2.0.md, lint 0 warnings
-20. `e816a40` R20 (tag) — chat.tsx mount tests (9), /api/embed + lib/embed.ts, /showcase demo, fix e2e/chat-drawer inert assertion, overall coverage 98.2%→99.8%
+20. `e816a40` R20 — chat.tsx mount tests (9), /api/embed + lib/embed.ts, /showcase demo, fix e2e/chat-drawer inert assertion, overall coverage 98.2%→99.8%
+21. `271a5b1` R21 (tag) — /search semantic-search demo (cosineSim + 64-dim vectors), chat.tsx catch test, 4 new e2e (search/styles-refine)
 
 ## Known limits
 
