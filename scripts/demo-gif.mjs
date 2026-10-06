@@ -1,6 +1,6 @@
 // Records the 试一下 flow -> docs/assets/demo.gif (800px, <8s). Needs ffmpeg. Local only.
 import { spawn, execFileSync } from "node:child_process";
-import { mkdirSync, renameSync, rmSync, statSync } from "node:fs";
+import { renameSync, rmSync, statSync } from "node:fs";
 import { chromium } from "@playwright/test";
 
 const BASE = "http://localhost:3000";
