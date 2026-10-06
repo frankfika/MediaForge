@@ -1,0 +1,40 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ env.TAG }}" }
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          v="${TAG#v}"
+          awk -v v="$v" '/^## \[/{p = index($0, "[" v "]") > 0; next} p' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "No CHANGELOG section for $v" >&2; exit 1; }
+      - name: Source tarball
+        run: git archive --format=tar.gz --prefix=mediaforge-${TAG}/ -o mediaforge-${TAG}.tar.gz "$TAG"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          body_path: notes.md
+          files: mediaforge-${{ env.TAG }}.tar.gz

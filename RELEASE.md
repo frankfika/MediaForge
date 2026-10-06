@@ -25,3 +25,16 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 
 ## Thanks
 Built with Next.js, Tailwind, Vercel AI SDK, Drizzle, Motion, Vitest and Playwright. Thanks to everyone who files issues.
+
+## Cutting a release
+`.github/workflows/release.yml` runs typecheck + test + build, then publishes a GitHub Release whose notes are the matching `## [x.y.z]` section of `CHANGELOG.md`, with a source tarball attached.
+
+```bash
+git remote add origin git@github.com:frankfika/MediaForge.git   # once
+git push -u origin main
+git push origin v0.1.0        # or: git push --tags  → triggers the release
+```
+Re-run for an existing tag: Actions → Release → Run workflow → enter `v0.1.0`.
+Add a `## [x.y.z]` section to CHANGELOG.md *before* tagging, or the workflow fails.
+
+GitHub Social Preview: upload `docs/assets/social-preview.png` (1280×640) at Settings → Social preview. Regenerate with `node scripts/og-image.mjs`.

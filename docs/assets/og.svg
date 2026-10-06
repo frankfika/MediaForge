@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" font-family="Helvetica, 'PingFang SC', sans-serif">
 <rect width="1200" height="630" fill="#0b0b0d"/>
+
 <text x="80" y="250" font-size="104" font-weight="700" fill="#fafafa">MediaForge</text>
 <text x="80" y="320" font-size="34" fill="#a1a1aa">贴一个链接,AI 用你的文风写给每个平台</text>
 <text x="80" y="362" font-size="26" fill="#71717a">Paste a link. Write in your voice. Copy, publish.</text>

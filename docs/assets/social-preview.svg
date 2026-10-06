@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" font-family="Helvetica, 'PingFang SC', sans-serif">
+<rect width="1280" height="640" fill="#0b0b0d"/>
+<rect x="1060" y="48" width="140" height="48" rx="24" fill="#1f1f23" stroke="#3a3a42"/><text x="1130" y="81" text-anchor="middle" font-size="24" fill="#fbbf24">★ Star</text>
+<text x="80" y="250" font-size="104" font-weight="700" fill="#fafafa">MediaForge</text>
+<text x="80" y="320" font-size="34" fill="#a1a1aa">贴一个链接,AI 用你的文风写给每个平台</text>
+<text x="80" y="362" font-size="26" fill="#71717a">Paste a link. Write in your voice. Copy, publish.</text>
+<rect x="80" y="400" width="150" height="52" rx="26" fill="#1f1f23" stroke="#3a3a42"/><text x="155" y="435" text-anchor="middle" font-size="24" fill="#d4d4d8">公众号</text><rect x="250" y="400" width="150" height="52" rx="26" fill="#1f1f23" stroke="#3a3a42"/><text x="325" y="435" text-anchor="middle" font-size="24" fill="#d4d4d8">X</text><rect x="420" y="400" width="150" height="52" rx="26" fill="#1f1f23" stroke="#3a3a42"/><text x="495" y="435" text-anchor="middle" font-size="24" fill="#d4d4d8">小红书</text><rect x="590" y="400" width="150" height="52" rx="26" fill="#1f1f23" stroke="#3a3a42"/><text x="665" y="435" text-anchor="middle" font-size="24" fill="#d4d4d8">B 站</text>
+<text x="1200" y="580" text-anchor="end" font-size="24" fill="#71717a">github.com/frankfika/MediaForge</text>
+</svg>
