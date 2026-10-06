@@ -8,8 +8,9 @@ import { PlatformSchema, StyleRefSchema } from "@/lib/types";
 export const maxDuration = 60;
 
 export const POST = route(
-  z.object({ messages: z.array(z.custom<UIMessage>()), style: StyleRefSchema.nullish() }),
-  async ({ messages, style }) => {
+  z.object({ messages: z.array(z.custom<UIMessage>()), style: StyleRefSchema.nullish(), xhsCookie: z.string().max(8000).optional() }),
+  async ({ messages, style, xhsCookie }) => {
+    const cookies = { xhs: xhsCookie };
     const result = streamText({
       model: model(),
       system: `${CHAT_SYSTEM}\n\n${styleSystem(style)}`,
@@ -19,7 +20,7 @@ export const POST = route(
         fetch_link: tool({
           description: "Fetch a tweet / Xiaohongshu / Bilibili / WeChat / article URL and return title, author, text, images, videos.",
           inputSchema: z.object({ url: z.string().url() }),
-          execute: ({ url }) => fetchLink(url),
+          execute: ({ url }) => fetchLink(url, cookies),
         }),
         rewrite_post: tool({
           description: "Rewrite a previously fetched link for the chosen platforms in the active style. The UI renders the result.",
@@ -29,7 +30,7 @@ export const POST = route(
             instruction: z.string().optional(),
           }),
           execute: async ({ url, platforms, instruction }) =>
-            rewrite({ source: await fetchLink(url), platforms, style, instruction }),
+            rewrite({ source: await fetchLink(url, cookies), platforms, style, instruction }),
         }),
       },
     });

@@ -21,10 +21,16 @@ function assertPublic(u: URL) {
     throw new Error("Private addresses are not allowed");
 }
 
-async function get(url: string) {
-  assertPublic(new URL(url));
+/** Cookies per site. Only sent to that site's own hosts, never to arbitrary URLs. */
+export type Cookies = { xhs?: string };
+const XHS = /(^|\.)(xiaohongshu\.com|xhslink\.com)$/;
+
+async function get(url: string, cookies?: Cookies) {
+  const target = new URL(url);
+  assertPublic(target);
+  const cookie = XHS.test(target.hostname) ? cookies?.xhs?.trim() : undefined;
   const res = await fetch(url, {
-    headers: { "user-agent": UA, "accept-language": "zh-CN,zh;q=0.9,en;q=0.8" },
+    headers: { "user-agent": UA, "accept-language": "zh-CN,zh;q=0.9,en;q=0.8", ...(cookie && { cookie }) },
     redirect: "follow",
     signal: AbortSignal.timeout(15_000),
   });
@@ -33,10 +39,10 @@ async function get(url: string) {
   return res;
 }
 
-async function twitter(u: URL): Promise<Source> {
+async function twitter(u: URL, cookies?: Cookies): Promise<Source> {
   const [, user, , id] = u.pathname.split("/"); // /{user}/status/{id}
   if (!user || !id) throw new Error("Not a tweet URL");
-  const { tweet } = (await (await get(`https://api.fxtwitter.com/${user}/status/${id}`)).json()) as {
+  const { tweet } = (await (await get(`https://api.fxtwitter.com/${user}/status/${id}`, cookies)).json()) as {
     tweet: {
       text: string;
       author: { name: string };
@@ -53,10 +59,10 @@ async function twitter(u: URL): Promise<Source> {
   };
 }
 
-async function bilibili(u: URL): Promise<Source> {
+async function bilibili(u: URL, cookies?: Cookies): Promise<Source> {
   const bvid = u.pathname.match(/BV\w+/)?.[0];
   if (!bvid) throw new Error("Not a Bilibili video URL");
-  const { data } = (await (await get(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`)).json()) as {
+  const { data } = (await (await get(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`, cookies)).json()) as {
     data: { title: string; desc: string; pic: string; owner: { name: string } };
   };
   return {
@@ -70,8 +76,8 @@ async function bilibili(u: URL): Promise<Source> {
 }
 
 /** WeChat (#js_content), Xiaohongshu (og: meta) and generic articles (Readability). */
-async function html(u: URL): Promise<Source> {
-  const { document } = parseHTML(await (await get(u.href)).text());
+async function html(u: URL, cookies?: Cookies): Promise<Source> {
+  const { document } = parseHTML(await (await get(u.href, cookies)).text());
   const meta = (p: string) => document.querySelector(`meta[property="${p}"]`)?.getAttribute("content") ?? "";
   const metaAll = (p: string) =>
     [...document.querySelectorAll(`meta[property="${p}"]`)].map((m) => m.getAttribute("content") ?? "").filter(Boolean);
@@ -130,8 +136,9 @@ async function firecrawl(u: URL): Promise<Source | null> {
 
 const thin = (s: Source) => s.text.length < 80;
 
-export async function fetchLink(raw: string): Promise<Source> {
-  const hit = cache.get(raw);
+export async function fetchLink(raw: string, cookies?: Cookies): Promise<Source> {
+  const key = cookies?.xhs ? `${raw}#c` : raw; // a cookie-less thin result must not shadow a logged-in retry
+  const hit = cache.get(key);
   if (hit && Date.now() - hit.at < 300_000) return hit.value;
 
   const u = new URL(raw);
@@ -139,14 +146,14 @@ export async function fetchLink(raw: string): Promise<Source> {
   const host = u.hostname.replace(/^www\./, "");
 
   let value: Source;
-  if (/^(b23\.tv|xhslink\.com)$/.test(host)) value = await fetchLink((await get(u.href)).url); // resolve short link
-  else if (/^(x|twitter)\.com$/.test(host)) value = await twitter(u);
-  else if (/(^|\.)bilibili\.com$/.test(host)) value = await bilibili(u);
+  if (/^(b23\.tv|xhslink\.com)$/.test(host)) value = await fetchLink((await get(u.href, cookies)).url, cookies); // resolve short link
+  else if (/^(x|twitter)\.com$/.test(host)) value = await twitter(u, cookies);
+  else if (/(^|\.)bilibili\.com$/.test(host)) value = await bilibili(u, cookies);
   else {
     let local: Source | null = null;
     let err: unknown;
     try {
-      local = await html(u);
+      local = await html(u, cookies);
     } catch (e) {
       err = e;
     }
@@ -155,6 +162,6 @@ export async function fetchLink(raw: string): Promise<Source> {
     value = local;
   }
 
-  cache.set(raw, { at: Date.now(), value });
+  cache.set(key, { at: Date.now(), value });
   return value;
 }

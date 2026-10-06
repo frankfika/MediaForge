@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { refineStyle } from "@/lib/ai";
 import { route } from "@/lib/http";
+import { refineStyle } from "@/lib/llm";
 import { StyleRefSchema, type Style } from "@/lib/types";
 
 export const maxDuration = 60;

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { PlatformPicker } from "@/components/platform-picker";
 import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
+import { XhsHint } from "@/components/xhs-hint";
+import { getXhsCookie } from "@/lib/cookie";
 import { post } from "@/lib/http";
 import { useStyles } from "@/lib/styles-store";
 import type { Platform, RewriteResult, Source } from "@/lib/types";
@@ -20,7 +22,7 @@ export default function RewritePage() {
     setLoading(true);
     setError("");
     try {
-      setOut(await post("/api/rewrite", { url, platforms, style: active }));
+      setOut(await post("/api/rewrite", { url, platforms, style: active, xhsCookie: getXhsCookie() }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "失败了");
     } finally {
@@ -37,6 +39,7 @@ export default function RewritePage() {
         placeholder="https://x.com/…  /  小红书  /  B 站  /  公众号"
         className="h-11 rounded-xl border border-line bg-card px-4 text-sm outline-none focus:border-accent"
       />
+      <XhsHint text={url} />
       <PlatformPicker value={platforms} onChange={setPlatforms} />
       <Button onClick={run} disabled={loading || !url || platforms.length === 0} className="self-start">
         {loading && <Loader2 className="size-4 animate-spin" />}

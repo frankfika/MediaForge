@@ -1,5 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { generateObject } from "ai";
+import { generateObject, generateText } from "ai";
 import { z } from "zod";
 import { PLATFORM_SPECS } from "./platforms";
 import {
@@ -85,4 +85,15 @@ ${feedback ? `\nUser feedback: ${feedback}\n` : ""}${
 Return the full updated prompt (<= 400 words) and a changelog.`,
   });
   return object;
+}
+
+export async function compose(args: { topic: string; platform?: Platform; references?: Source[]; style?: StyleRef | null }): Promise<string> {
+  const { text } = await generateText({
+    model: model(),
+    system: `${styleSystem(args.style)}\n\n${args.platform ? `Target platform: ${PLATFORM_SPECS[args.platform].label} — ${PLATFORM_SPECS[args.platform].guide}` : "Write an original long-form article in Markdown with a title line (# ...)."} Ground claims in the references when given; never invent facts or quotes.`,
+    prompt: `Topic: ${args.topic}\n\n${(args.references ?? [])
+      .map((r) => `<reference url="${r.url}" title="${r.title}">\n${r.text.slice(0, 6000)}\n</reference>`)
+      .join("\n")}`,
+  });
+  return text;
 }

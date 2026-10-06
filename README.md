@@ -66,8 +66,25 @@ docs/           architecture · product-spec · style-agent · api · data-model
 
 ## 当前状态 Status
 
-骨架阶段。已跑通:四个核心路由 + `/api/chat`、抓取器、对话闭环、风格学习/修正(localStorage 持久化)。
-未做(见各文档 Roadmap):登录与 Postgres 持久化、ZIP/HTML 导出、全局 ⌘K 对话抽屉、风格自动评测、小红书登录态抓取。
+骨架 + 端到端骨架。已跑通:
+- 5 页面 / 12 个 API 路由(对话、改写、创作、风格、导出、全局、风格云同步)
+- 全局 ⌘K 抽屉 / 公众号内联 HTML / ZIP 导出 / jszip 浏览器打包
+- Firecrawl 兜底抓取 / 小红书 cookie 配置
+- 风格 Agent:本地存储 + Postgres 可选同步 + 版本回滚(不绕过 MCP)
+- **MCP server**:Claude Code / Cursor / Codex 可以直接调用,无 key 时有确定性 mock
+- Mock LLM:无 `ANTHROPIC_API_KEY` 时所有路由仍返回合理响应(`"llm": "mock"` 标识)
+
+未做(见各文档 Roadmap):真对话 demo(填 key 即可)、登录态抓取成功率优化(只能尽力而为)、第三方平台发布自动化、Storybook、e2e tests。
+
+## MCP(MediaForge 作为 AI Agent 工具)
+
+[docs/mcp.md](docs/mcp.md) — 完整接入 Claude Code / Cursor / Codex。**无 key 也能跑**(mock LLM)。
+
+```bash
+pnpm mcp              # stdio MCP server,stderr: [mediaforge-mcp] ready (llm: mock)
+```
+
+工具:`rewrite_url`、`compose_post`、`learn_style`、`refine_style`。返回 JSON 顶层有 `"llm": "mock"|"anthropic"` 让调用方判断真假。
 
 ## 开发分工 Workflow
 

@@ -15,7 +15,7 @@ export const POST = route(
     style: StyleRefSchema.nullish(),
   }),
   async ({ prompt, links = [], style }) => {
-    const refs = (await Promise.allSettled(links.map(fetchLink))).flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+    const refs = (await Promise.allSettled(links.map((l) => fetchLink(l)))).flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
     const result = streamText({
       model: model(),
       system: `${styleSystem(style)}\n\nWrite an original long-form article in Markdown with a title line (# ...). Ground claims in the references when given; never invent facts or quotes.`,

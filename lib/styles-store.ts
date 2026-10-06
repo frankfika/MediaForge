@@ -41,3 +41,9 @@ export function useStyles() {
     return { styles, active: styles.find((s) => s.id === active) ?? null };
   }, [raw]);
 }
+
+/** Replace the whole local cache (used by cloud sync). Keeps the active style if it still exists. */
+export const replaceStyles = (next: Style[]) => {
+  const { active } = parse();
+  write({ styles: next, active: next.some((s) => s.id === active) ? active : (next[0]?.id ?? null) });
+};

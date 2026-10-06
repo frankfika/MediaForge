@@ -15,10 +15,11 @@ export const POST = route(
       platforms: z.array(PlatformSchema).min(1),
       style: StyleRefSchema.nullish(),
       instruction: z.string().max(500).optional(),
+      xhsCookie: z.string().max(8000).optional(), // user-supplied login state; only sent to xiaohongshu hosts
     })
     .refine((b) => b.url || b.source, "Provide url or source"),
-  async ({ url, source, platforms, style, instruction }) => {
-    const src = source ?? (await fetchLink(url!));
+  async ({ url, source, platforms, style, instruction, xhsCookie }) => {
+    const src = source ?? (await fetchLink(url!, { xhs: xhsCookie }));
     return { source: src, ...(await rewrite({ source: src, platforms, style, instruction })) };
   },
 );

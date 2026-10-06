@@ -6,6 +6,8 @@ import { motion } from "motion/react";
 import { useState, type FormEvent } from "react";
 import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
+import { XhsHint } from "@/components/xhs-hint";
+import { getXhsCookie } from "@/lib/cookie";
 import { useStyles } from "@/lib/styles-store";
 import type { ChatMessage } from "@/lib/types";
 
@@ -28,7 +30,7 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
 
   function send(text: string) {
     if (!text.trim() || busy) return;
-    sendMessage({ text }, { body: { style: active } });
+    sendMessage({ text }, { body: { style: active, xhsCookie: getXhsCookie() } });
     setInput("");
   }
   const onSubmit = (e: FormEvent) => (e.preventDefault(), send(input));
@@ -69,6 +71,7 @@ export function Chat({ variant = "page" }: { variant?: keyof typeof transports }
       {error && <p className="text-sm text-red-500">{error.message}</p>}
 
       <form onSubmit={onSubmit} className={drawer ? "sticky bottom-0 mt-auto bg-bg pb-4 pt-2" : "fixed inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg to-transparent px-4 pb-5 pt-8"}>
+        <div className="mx-auto max-w-3xl px-2 empty:hidden"><XhsHint text={input} /></div>
         <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-line bg-card p-2 shadow-sm">
           <textarea
             value={input}

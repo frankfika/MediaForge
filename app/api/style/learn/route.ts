@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { learnStyle } from "@/lib/ai";
 import { fetchLink } from "@/lib/fetcher";
 import { route } from "@/lib/http";
+import { learnStyle } from "@/lib/llm";
 import type { Style } from "@/lib/types";
 
 export const maxDuration = 120;
