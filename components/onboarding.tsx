@@ -12,7 +12,7 @@ const steps: { href: string; icon: LucideIcon; titleKey: Key; descKey: Key; exte
   { href: "/styles", icon: Palette, titleKey: "firstRun.step1.title", descKey: "firstRun.step1.desc" },
   { href: "/search", icon: Search, titleKey: "firstRun.step2.title", descKey: "firstRun.step2.desc" },
   { href: "/showcase", icon: LayoutGrid, titleKey: "firstRun.step3.title", descKey: "firstRun.step3.desc" },
-  { href: "/docs/mcp.md", icon: Plug, titleKey: "firstRun.step4.title", descKey: "firstRun.step4.desc", external: true },
+  { href: "/mcp-guide.md", icon: Plug, titleKey: "firstRun.step4.title", descKey: "firstRun.step4.desc", external: true },
 ];
 
 /** First-visit onboarding card; dismissed via localStorage flag. Hidden during SSR/hydration to avoid flash. */

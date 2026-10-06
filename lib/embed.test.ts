@@ -53,7 +53,10 @@ describe("getOpenAIProvider", () => {
 
 describe("generateEmbeddingsAuto", () => {
   beforeEach(() => vi.unstubAllEnvs());
-  afterEach(() => vi.unstubAllEnvs());
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
 
   it("falls back to mock with provider label when no key", async () => {
     const r = await generateEmbeddingsAuto(["a", "b"]);
@@ -98,5 +101,28 @@ describe("generateEmbeddingsAuto", () => {
       [0.1, 0.2, 0.3],
       [0.4, 0.5, 0.6],
     ]);
+  });
+
+  it("falls back to mock when upstream responds non-ok", async () => {
+    vi.stubEnv("OPENAI_API_KEY", "sk-test");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("boom", { status: 500 })),
+    );
+    const r = await generateEmbeddingsAuto(["hi"]);
+    expect(r.provider).toBe("mock");
+    expect(r.vectors[0]).toHaveLength(EMBED_DIM);
+  });
+
+  it("defaults model to text-embedding-3-small when OPENAI_EMBEDDING_MODEL is unset", async () => {
+    vi.stubEnv("OPENAI_API_KEY", "sk-test");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ data: [{ embedding: [1, 2] }] }), { status: 200 })),
+    );
+    const r = await generateEmbeddingsAuto(["hi"]);
+    expect(r.provider).toBe("openai");
+    expect(r.model).toBe("text-embedding-3-small");
+    expect(r.dim).toBe(2);
   });
 });

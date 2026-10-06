@@ -60,7 +60,7 @@ describe("Onboarding", () => {
 
   it("renders the 4 step links", async () => {
     await render();
-    expect(links()).toEqual(["/styles", "/search", "/showcase", "/docs/mcp.md"]);
+    expect(links()).toEqual(["/styles", "/search", "/showcase", "/mcp-guide.md"]);
     expect(host.textContent).toContain("加载演示风格");
     expect(host.textContent).toContain("试试语义搜索");
     expect(host.textContent).toContain("看组件预览");

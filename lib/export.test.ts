@@ -72,4 +72,15 @@ describe("buildExport", () => {
   it("x without title is body only; x with title prefixes it", () => {
     expect(buildExport({ posts: [{ platform: "x", title: "T", body: "b" }], media: { images: [], videos: [] } }).x_txt).toBe("T\n\nb");
   });
+  it("xhs/bilibili without title export body only", () => {
+    const b = buildExport({
+      posts: [
+        { platform: "xhs", body: "无题" },
+        { platform: "bilibili", body: "正文" },
+      ],
+      media: { images: [], videos: [] },
+    });
+    expect(b.xhs_md).toBe("无题\n");
+    expect(b.bilibili_md).toBe("正文\n");
+  });
 });

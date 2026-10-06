@@ -182,6 +182,16 @@ describe("useStylesDb", () => {
     expect(h.get().migrationDismissed).toBe(true);
     await h.unmount();
   });
+  it("pending is [] in db mode before remoteIds is populated", async () => {
+    // 4xx is rethrown (not degraded), leaving mode "db" with remoteIds null
+    routes["GET /api/styles"] = () => ({ status: 400, body: { error: "bad" } });
+    await expect(setMode("db")).rejects.toThrow("bad");
+    const h = await render();
+    expect(h.get().mode).toBe("db");
+    expect(h.get().remoteIds).toBeNull();
+    expect(h.get().pending).toEqual([]);
+    await h.unmount();
+  });
   it("syncNow sets busy false and warning dismissable", async () => {
     const h = await render();
     routes["GET /api/styles"] = () => ({ status: 503, body: { error: "e" } });

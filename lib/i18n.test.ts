@@ -9,6 +9,12 @@ describe("t()", () => {
     expect(t("chat.subActive", "zh", { name: "我的号" })).toBe("贴一个链接,或者说一个话题。当前风格:我的号"));
   it("replaces multiple placeholders", () => expect(t("src.counts", "en", { images: 3, videos: 1 })).toBe("3 images · 1 videos"));
   it("leaves unknown placeholders untouched", () => expect(t("chat.subActive", "zh")).toBe("贴一个链接,或者说一个话题。当前风格:{name}"));
+  it("leaves placeholders absent from params untouched", () =>
+    expect(t("chat.subActive", "zh", { other: "x" })).toBe("贴一个链接,或者说一个话题。当前风格:{name}"));
+  it("falls back to the key itself when missing from both dictionaries", () => {
+    expect(t("no.such.key" as never)).toBe("no.such.key");
+    expect(t("no.such.key" as never, "en")).toBe("no.such.key");
+  });
 });
 
 describe("isLocale", () => {
