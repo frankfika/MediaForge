@@ -330,7 +330,7 @@ export const isLocale = (v: unknown): v is Locale => LOCALES.includes(v as Local
 
 /** Look up `key` in `locale` (default zh), filling `{name}` placeholders from `params`. Unknown placeholders are left as-is. */
 export function t(key: Key, locale: Locale = "zh", params?: Record<string, string | number>): string {
-  const s = DICTS[locale][key] ?? zh[key] ?? key;
+  const s = (DICTS[locale] ?? DICTS.zh)[key] ?? DICTS.zh[key] ?? key;
   return params ? s.replace(/\{(\w+)\}/g, (m, k: string) => (k in params ? String(params[k]) : m)) : s;
 }
 

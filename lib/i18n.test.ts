@@ -1,0 +1,40 @@
+import { describe, expect, it } from "vitest";
+import { en, HTML_LANG, isLocale, LOCALES, LOCALE_COOKIE, localeFromCookie, t, zh, type Key } from "./i18n";
+
+describe("t()", () => {
+  it("looks up zh by default", () => expect(t("nav.chat")).toBe("对话"));
+  it("looks up en when locale is provided", () => expect(t("nav.chat", "en")).toBe("Chat"));
+  it("falls back to zh when locale is unknown", () => expect(t("nav.chat", "de" as never)).toBe("对话"));
+  it("replaces single placeholder from params", () =>
+    expect(t("chat.subActive", "zh", { name: "我的号" })).toBe("贴一个链接,或者说一个话题。当前风格:我的号"));
+  it("replaces multiple placeholders", () => expect(t("src.counts", "en", { images: 3, videos: 1 })).toBe("3 images · 1 videos"));
+  it("leaves unknown placeholders untouched", () => expect(t("chat.subActive", "zh")).toBe("贴一个链接,或者说一个话题。当前风格:{name}"));
+});
+
+describe("isLocale", () => {
+  it.each(["zh", "en"] as const)("accepts %s", (l) => expect(isLocale(l)).toBe(true));
+  it.each(["de", "ja", "fr", "", "ZH", undefined, null])("rejects %s", (v) => expect(isLocale(v)).toBe(false));
+});
+
+describe("localeFromCookie", () => {
+  it("parses the locale cookie", () => expect(localeFromCookie(`${LOCALE_COOKIE}=en; other=1`)).toBe("en"));
+  it("falls back to zh when the cookie is missing", () => expect(localeFromCookie("foo=bar")).toBe("zh"));
+  it("falls back to zh when the value is invalid", () => expect(localeFromCookie(`${LOCALE_COOKIE}=fr`)).toBe("zh"));
+  it("tolerates malformed input", () => expect(localeFromCookie(undefined)).toBe("zh"));
+  it("handles trailing/leading whitespace between pairs", () => expect(localeFromCookie(`  ${LOCALE_COOKIE}=zh  ;   foo=bar`)).toBe("zh"));
+});
+
+describe("dictionaries", () => {
+  it("every zh key exists in en", () => {
+    const zhKeys = Object.keys(zh) as Key[];
+    expect(zhKeys.length).toBeGreaterThan(50);
+    for (const k of zhKeys) expect(en).toHaveProperty(k);
+  });
+  it("every en key exists in zh", () => {
+    const enKeys = Object.keys(en) as Key[];
+    for (const k of enKeys) expect(zh).toHaveProperty(k);
+  });
+  it("LOCALES and HTML_LANG line up", () => {
+    expect(Object.keys(HTML_LANG).sort()).toEqual([...LOCALES].sort());
+  });
+});

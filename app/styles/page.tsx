@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/use-t";
 import { post } from "@/lib/http";
 import { loadDemoStyles, setActiveStyle, useStyles } from "@/lib/styles-store";
 import {
@@ -424,6 +425,7 @@ function StyleCard({ style, isActive }: { style: Style; isActive: boolean }) {
 }
 
 export default function StylesPage() {
+  const t = useT();
   const { styles, active } = useStyles();
   const [name, setName] = useState("");
   const [samples, setSamples] = useState("");
@@ -452,7 +454,7 @@ export default function StylesPage() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center">
-        <h1 className="text-2xl font-semibold tracking-tight">风格</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("styles.title")}</h1>
         <Button size="sm" variant="outline" className="ml-auto" onClick={loadDemoStyles}>
           加载演示风格
         </Button>
