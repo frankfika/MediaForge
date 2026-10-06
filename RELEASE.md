@@ -9,15 +9,17 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 - **MCP server**, ⌘K chat drawer, `/showcase`, Playwright e2e, CI.
 
 ## Commits
-1. `74d52ae` v0.1 skeleton — Next.js 15 / Tailwind v4 / cva UI, 5 pages
+1. `74d52ae` R2 — skeleton: Next.js 15 / Tailwind v4 / cva UI, 5 pages
 2. `40bcceb` R3 — export pipeline, ⌘K drawer, Firecrawl fallback, DB client
 3. `814ef66` R4 — cloud styles + rollback, MCP server, XHS cookie settings
-4. `a103b6e` R5 — demo styles, mock LLM, try-it button, health, tests
+4. `a103b6e` R5 — demo styles, mock LLM, try-it button, health, 15 tests
 5. `1e1c7fa` R6 — error pages, empty states, CI, LICENSE, deploy docs
-6. `019e9b9` R7 — Playwright e2e, CI e2e job
-7. `e8134c4` R8 — README screenshots, CHANGELOG
-8. `9a3ec2b` R9 — demo GIF, `/showcase`, OG image
-9. R10 — style judge, `/styles` 测评 button, issue/PR templates, this file
+6. `019e9b9` R7 — Playwright e2e, CI e2e job, .env.example polish
+7. `e8134c4` R8 — README screenshots (5 PNG), CHANGELOG v0.1.0
+8. `9a3ec2b` R9 — demo GIF, `/showcase` page, OG image
+9. `be6e54f` R10 — style judge (5 signals + 8 tests), 测评 UI, GitHub issue/PR templates
+10. `af39a2d` R11 — style import/export JSON, theme toggle (light/dark/system), `pnpm demo:mcp`
+11. `856f3bf` R12 (tag) — social-preview 1280x640, release workflow, Drizzle SQL migration
 
 ## Known limits
 - The judge is heuristic (char-bigram vocabulary, S/M/L rhythm); the LLM blind-test loop in `docs/style-agent.md` §6 is not implemented.
