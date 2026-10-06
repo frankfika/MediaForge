@@ -103,6 +103,33 @@ async function html(u: URL): Promise<Source> {
   };
 }
 
+/** Firecrawl fallback for login walls / JS-only pages. Returns null (never throws) when no key or on any failure. */
+async function firecrawl(u: URL): Promise<Source | null> {
+  const key = process.env.FIRECRAWL_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch("https://api.firecrawl.dev/v1/scrape", {
+      method: "POST",
+      headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+      body: JSON.stringify({ url: u.href, formats: ["markdown"], onlyMainContent: true }),
+      signal: AbortSignal.timeout(45_000),
+    });
+    if (!res.ok) return null;
+    const { data } = (await res.json()) as {
+      data?: { markdown?: string; metadata?: { title?: string; author?: string; ogImage?: string; ogTitle?: string } };
+    };
+    const text = data?.markdown?.trim();
+    if (!text) return null;
+    const m = data?.metadata ?? {};
+    const images = [...new Set([m.ogImage, ...[...text.matchAll(/!\[[^\]]*\]\((https?:[^)\s]+)\)/g)].map((x) => x[1])])].filter((s): s is string => !!s);
+    return { url: u.href, title: m.title || m.ogTitle || "", author: m.author ?? "", text, images, videos: [] };
+  } catch {
+    return null;
+  }
+}
+
+const thin = (s: Source) => s.text.length < 80;
+
 export async function fetchLink(raw: string): Promise<Source> {
   const hit = cache.get(raw);
   if (hit && Date.now() - hit.at < 300_000) return hit.value;
@@ -115,7 +142,18 @@ export async function fetchLink(raw: string): Promise<Source> {
   if (/^(b23\.tv|xhslink\.com)$/.test(host)) value = await fetchLink((await get(u.href)).url); // resolve short link
   else if (/^(x|twitter)\.com$/.test(host)) value = await twitter(u);
   else if (/(^|\.)bilibili\.com$/.test(host)) value = await bilibili(u);
-  else value = await html(u); // ponytail: XHS often needs login; plug Firecrawl here if og: tags come back empty
+  else {
+    let local: Source | null = null;
+    let err: unknown;
+    try {
+      local = await html(u);
+    } catch (e) {
+      err = e;
+    }
+    if (!local || thin(local)) local = (await firecrawl(u)) ?? local;
+    if (!local) throw err;
+    value = local;
+  }
 
   cache.set(raw, { at: Date.now(), value });
   return value;

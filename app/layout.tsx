@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { ChatDrawer } from "@/components/chat-drawer";
 import { Nav } from "@/components/nav";
 import "./globals.css";
 
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="zh-CN">
       <body className="min-h-dvh">
         <Nav />
+        <ChatDrawer />
         <main className="mx-auto w-full max-w-3xl px-4 pb-32 pt-6">{children}</main>
       </body>
     </html>

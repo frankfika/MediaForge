@@ -1,7 +1,9 @@
 "use client";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Download, Newspaper } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { post as postJson } from "@/lib/http";
+import type { ExportBundle } from "@/lib/export";
 import { PLATFORM_SPECS } from "@/lib/platforms";
 import type { RewriteResult, Source } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ export function SourceCard({ source }: { source: Source }) {
 export function PostTabs({ result }: { result: RewriteResult }) {
   const [i, setI] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [wx, setWx] = useState(false);
   const post = result.posts[i];
   if (!post) return null;
   const text = post.title ? `${post.title}\n\n${post.body}` : post.body;
@@ -41,9 +44,65 @@ export function PostTabs({ result }: { result: RewriteResult }) {
     setTimeout(() => setCopied(false), 1500);
   }
 
+  const exportBundle = () => postJson<ExportBundle>("/api/export", result);
+
+  async function copyWechat() {
+    const { wechat_html } = await exportBundle();
+    // Modern path: ClipboardItem (Chrome / Safari / Firefox 127+); ignored by WeChat's in-app browser.
+    if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/html": new Blob([wechat_html], { type: "text/html" }),
+            "text/plain": new Blob([wechat_html.replace(/<[^>]+>/g, "")], { type: "text/plain" }),
+          }),
+        ]);
+        setWx(true);
+        setTimeout(() => setWx(false), 1500);
+        return;
+      } catch {}
+    }
+    // Legacy fallback: works everywhere including WeChat's in-app browser.
+    const ta = document.createElement("textarea");
+    ta.value = wechat_html;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    setWx(true);
+    setTimeout(() => setWx(false), 1500);
+  }
+
+  async function downloadZip() {
+    const [{ default: JSZip }, bundle] = await Promise.all([import("jszip"), exportBundle()]);
+    const zip = new JSZip();
+    bundle.files.forEach((f) => zip.file(f.name, f.content));
+    // Images are best-effort: most CDNs block cross-origin reads, media.txt lists every URL anyway.
+    await Promise.all(
+      result.media.images.map(async (src, n) => {
+        try {
+          const r = await fetch(src);
+          if (r.ok) zip.file(`images/${n + 1}.${(r.headers.get("content-type") ?? "").split("/")[1]?.split(";")[0] || "jpg"}`, await r.blob());
+        } catch {}
+      }),
+    );
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mediaforge-export.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // iOS Safari: revoke too soon cancels the download
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   return (
     <div className="rounded-[var(--radius-card)] border border-line bg-card">
-      <div className="flex items-center gap-1 border-b border-line p-2">
+      <div className="flex flex-wrap items-center gap-1 border-b border-line p-2">
         {result.posts.map((p, idx) => (
           <button
             key={p.platform}
@@ -53,7 +112,18 @@ export function PostTabs({ result }: { result: RewriteResult }) {
             {PLATFORM_SPECS[p.platform].label}
           </button>
         ))}
-        <Button size="sm" variant="outline" className="ml-auto" onClick={copy}>
+        <span className="ml-auto" />
+        {result.posts.some((p) => p.platform === "wechat") && (
+          <Button size="sm" variant="ghost" onClick={copyWechat}>
+            {wx ? <Check className="size-3.5" /> : <Newspaper className="size-3.5" />}
+            {wx ? "已复制" : "复制到公众号"}
+          </Button>
+        )}
+        <Button size="sm" variant="ghost" onClick={downloadZip}>
+          <Download className="size-3.5" />
+          ZIP
+        </Button>
+        <Button size="sm" variant="outline" onClick={copy}>
           {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           {copied ? "已复制" : "复制"}
         </Button>

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useStyles } from "@/lib/styles-store";
 import type { ChatMessage } from "@/lib/types";
 
-const transport = new DefaultChatTransport({ api: "/api/chat" });
+const transports = { page: new DefaultChatTransport({ api: "/api/chat" }), drawer: new DefaultChatTransport({ api: "/api/global-chat" }) };
 const SUGGESTIONS = ["粘贴一条推文 / 小红书 / B 站链接,我来改写", "围绕「AI 编程助手的下一步」写一篇公众号文章", "把这篇文章改成小红书风格"];
 
 const Status = ({ children }: { children: string }) => (
@@ -19,9 +19,10 @@ const Status = ({ children }: { children: string }) => (
   </p>
 );
 
-export function Chat() {
+export function Chat({ variant = "page" }: { variant?: keyof typeof transports }) {
+  const drawer = variant === "drawer";
   const { active } = useStyles();
-  const { messages, sendMessage, status, error } = useChat<ChatMessage>({ transport });
+  const { messages, sendMessage, status, error } = useChat<ChatMessage>({ transport: transports[variant] });
   const [input, setInput] = useState("");
   const busy = status === "submitted" || status === "streaming";
 
@@ -33,9 +34,9 @@ export function Chat() {
   const onSubmit = (e: FormEvent) => (e.preventDefault(), send(input));
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={drawer ? "flex min-h-full flex-col gap-6" : "flex flex-col gap-6"}>
       {messages.length === 0 && (
-        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="pt-[12vh] text-center">
+        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={drawer ? "pt-8 text-center" : "pt-[12vh] text-center"}>
           <h1 className="text-3xl font-semibold tracking-tight">今天想发点什么?</h1>
           <p className="mt-2 text-sm text-muted">贴一个链接,或者说一个话题。{active ? `当前风格:${active.name}` : "尚未选择风格,将使用默认文风。"}</p>
           <div className="mt-8 flex flex-col items-center gap-2">
@@ -67,7 +68,7 @@ export function Chat() {
       {busy && messages.at(-1)?.role === "user" && <Status>思考中…</Status>}
       {error && <p className="text-sm text-red-500">{error.message}</p>}
 
-      <form onSubmit={onSubmit} className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg to-transparent px-4 pb-5 pt-8">
+      <form onSubmit={onSubmit} className={drawer ? "sticky bottom-0 mt-auto bg-bg pb-4 pt-2" : "fixed inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg to-transparent px-4 pb-5 pt-8"}>
         <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-line bg-card p-2 shadow-sm">
           <textarea
             value={input}
