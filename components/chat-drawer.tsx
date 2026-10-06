@@ -4,9 +4,11 @@ import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Chat } from "@/components/chat";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/use-t";
 
 /** ⌘K / Ctrl+K opens a global chat drawer on any page. Stays mounted after first open so the conversation survives close. */
 export function ChatDrawer() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [seen, setSeen] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
@@ -46,7 +48,7 @@ export function ChatDrawer() {
         ref={panel}
         role="dialog"
         aria-modal="true"
-        aria-label="全局对话"
+        aria-label={t("drawer.label")}
         inert={!open}
         initial={false}
         animate={{ x: open ? 0 : "100%" }}
@@ -55,9 +57,9 @@ export function ChatDrawer() {
       >
         <div className="flex h-12 shrink-0 items-center justify-between border-b border-line px-4">
           <span className="text-sm font-medium">
-            MediaForge 助手 <kbd className="ml-2 rounded border border-line px-1 text-[10px] text-muted">⌘K</kbd>
+            {t("drawer.title")} <kbd className="ml-2 rounded border border-line px-1 text-[10px] text-muted">⌘K</kbd>
           </span>
-          <Button variant="ghost" size="icon" aria-label="关闭" onClick={() => setOpen(false)}>
+          <Button variant="ghost" size="icon" aria-label={t("common.close")} onClick={() => setOpen(false)}>
             <X className="size-4" />
           </Button>
         </div>

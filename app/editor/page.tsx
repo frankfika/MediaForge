@@ -8,9 +8,11 @@ import { PostTabs } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
 import { post } from "@/lib/http";
 import { upsertStyle, useStyles } from "@/lib/styles-store";
+import { useT } from "@/lib/use-t";
 import type { Platform, RewriteResult, Style } from "@/lib/types";
 
 export default function EditorPage() {
+  const t = useT();
   const { active } = useStyles();
   const [topic, setTopic] = useState("");
   const [links, setLinks] = useState("");
@@ -35,7 +37,7 @@ export default function EditorPage() {
     try {
       await fn();
     } catch (e) {
-      setNote(e instanceof Error ? e.message : "失败了");
+      setNote(e instanceof Error ? e.message : t("common.failed"));
     } finally {
       setBusy(false);
     }
@@ -56,32 +58,32 @@ export default function EditorPage() {
         edited: draft,
       });
       upsertStyle(r.style);
-      setNote(`风格已更新到 v${r.style.version}:${r.changelog.join(";")}`);
+      setNote(t("editor.styleUpdated", { version: r.style.version, changelog: r.changelog.join(";") }));
     });
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-semibold tracking-tight">创作</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{t("editor.title")}</h1>
       <input
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
-        placeholder="话题或一句话 brief"
+        placeholder={t("editor.topic")}
         className="h-11 rounded-xl border border-line bg-card px-4 text-sm outline-none focus:border-accent"
       />
       <textarea
         value={links}
         onChange={(e) => setLinks(e.target.value)}
         rows={2}
-        placeholder="参考链接(可选,空格或换行分隔,最多 5 个)"
+        placeholder={t("editor.links")}
         className="rounded-xl border border-line bg-card px-4 py-2 text-sm outline-none focus:border-accent"
       />
       <Button onClick={generate} disabled={isLoading || !topic} className="self-start">
         {isLoading && <Loader2 className="size-4 animate-spin" />}
-        生成初稿
+        {t("editor.generate")}
       </Button>
       {error && <p className="text-sm text-red-500">{error.message}</p>}
 
-      {!draft && !isLoading && !error && <EmptyState icon={PenLine} title="还没有初稿" hint="写下话题,可附参考链接,点「生成初稿」。" />}
+      {!draft && !isLoading && !error && <EmptyState icon={PenLine} title={t("editor.emptyTitle")} hint={t("editor.emptyHint")} />}
       {(draft || isLoading) && (
         <>
           <textarea
@@ -93,15 +95,15 @@ export default function EditorPage() {
           <PlatformPicker value={platforms} onChange={setPlatforms} />
           <div className="flex gap-2">
             <Button onClick={adapt} disabled={busy || isLoading || platforms.length === 0}>
-              适配平台
+              {t("editor.adapt")}
             </Button>
             <Button
               variant="outline"
               onClick={learnFromEdits}
               disabled={busy || !active || edited === null || edited === completion}
-              title={active ? "" : "先在「风格」页创建并选择一个风格"}
+              title={active ? "" : t("editor.needStyle")}
             >
-              从我的修改中学习
+              {t("editor.learn")}
             </Button>
           </div>
         </>

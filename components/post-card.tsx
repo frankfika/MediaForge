@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { post as postJson } from "@/lib/http";
 import type { ExportBundle } from "@/lib/export";
 import { PLATFORM_SPECS } from "@/lib/platforms";
+import { useT } from "@/lib/use-t";
 import type { RewriteResult, Source } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +17,12 @@ const Img = ({ src }: { src: string }) => (
 );
 
 export function SourceCard({ source }: { source: Source }) {
+  const t = useT();
   return (
     <div className="rounded-[var(--radius-card)] border border-line bg-card p-4 text-sm">
       <p className="font-medium">{source.title || source.url}</p>
       <p className="mt-0.5 text-xs text-muted">
-        {source.author} · {source.images.length} 图 · {source.videos.length} 视频
+        {source.author} · {t("src.counts", { images: source.images.length, videos: source.videos.length })}
       </p>
       <p className="mt-2 line-clamp-3 text-muted">{source.text}</p>
       {source.images.length > 0 && (
@@ -36,11 +38,12 @@ export function SourceCard({ source }: { source: Source }) {
 
 /** One tab per platform; one click copies title + body. */
 export function PostTabs({ result }: { result: RewriteResult }) {
+  const t = useT();
   const [i, setI] = useState(0);
   const [copied, setCopied] = useState(false);
   const [wx, setWx] = useState(false);
   const post = result.posts[i];
-  if (!post) return <EmptyState icon={FileText} title="没有生成任何平台的内容" hint="换个平台,或调整输入后重试。" />;
+  if (!post) return <EmptyState icon={FileText} title={t("post.emptyTitle")} hint={t("post.emptyHint")} />;
   const text = post.title ? `${post.title}\n\n${post.body}` : post.body;
 
   async function copy() {
@@ -115,14 +118,14 @@ export function PostTabs({ result }: { result: RewriteResult }) {
             onClick={() => setI(idx)}
             className={cn("rounded-md px-2.5 py-1 text-sm text-muted", idx === i && "bg-line text-fg")}
           >
-            {PLATFORM_SPECS[p.platform].label}
+            {t(`platform.${p.platform}`)}
           </button>
         ))}
         <span className="ml-auto" />
         {result.posts.some((p) => p.platform === "wechat") && (
           <Button size="sm" variant="ghost" onClick={copyWechat}>
             {wx ? <Check className="size-3.5" /> : <Newspaper className="size-3.5" />}
-            {wx ? "已复制" : "复制到公众号"}
+            {wx ? t("post.copied") : t("post.copyWechat")}
           </Button>
         )}
         <Button size="sm" variant="ghost" onClick={downloadZip}>
@@ -131,7 +134,7 @@ export function PostTabs({ result }: { result: RewriteResult }) {
         </Button>
         <Button size="sm" variant="outline" onClick={copy}>
           {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-          {copied ? "已复制" : "复制"}
+          {copied ? t("post.copied") : t("post.copy")}
         </Button>
       </div>
       <div className="p-4 text-sm leading-relaxed">
@@ -147,7 +150,7 @@ export function PostTabs({ result }: { result: RewriteResult }) {
             ))}
             {result.media.videos.map((v) => (
               <a key={v} href={v} target="_blank" rel="noreferrer" className="text-xs text-accent underline">
-                视频 ↗
+                {t("post.video")}
               </a>
             ))}
           </div>

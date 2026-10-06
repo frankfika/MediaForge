@@ -1,13 +1,10 @@
 "use client";
 import { useEffect, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/use-t";
 
-export const THEMES = [
-  ["light", "浅色"],
-  ["dark", "深色"],
-  ["system", "跟随系统"],
-] as const;
-type Theme = (typeof THEMES)[number][0];
+const THEMES = ["light", "dark", "system"] as const;
+type Theme = (typeof THEMES)[number];
 const KEY = "mediaforge.theme";
 const listeners = new Set<() => void>();
 
@@ -30,6 +27,7 @@ export function ThemeInit() {
 }
 
 export function ThemeToggle() {
+  const tr = useT();
   const theme = useSyncExternalStore(subscribe, read, () => "system" as Theme);
   function set(t: Theme) {
     t === "system" ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, t);
@@ -37,10 +35,10 @@ export function ThemeToggle() {
     listeners.forEach((l) => l());
   }
   return (
-    <div role="group" aria-label="主题" className="flex gap-2">
-      {THEMES.map(([t, label]) => (
+    <div role="group" aria-label={tr("settings.theme")} className="flex gap-2">
+      {THEMES.map((t) => (
         <Button key={t} size="sm" variant={theme === t ? "primary" : "outline"} aria-pressed={theme === t} onClick={() => set(t)}>
-          {label}
+          {tr(`theme.${t}`)}
         </Button>
       ))}
     </div>

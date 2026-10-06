@@ -9,9 +9,11 @@ import { XhsHint } from "@/components/xhs-hint";
 import { getXhsCookie } from "@/lib/cookie";
 import { post } from "@/lib/http";
 import { useStyles } from "@/lib/styles-store";
+import { useT } from "@/lib/use-t";
 import type { Platform, RewriteResult, Source } from "@/lib/types";
 
 export default function RewritePage() {
+  const t = useT();
   const { active } = useStyles();
   const [url, setUrl] = useState("");
   const [platforms, setPlatforms] = useState<Platform[]>(["xhs"]);
@@ -25,7 +27,7 @@ export default function RewritePage() {
     try {
       setOut(await post("/api/rewrite", { url, platforms, style: active, xhsCookie: getXhsCookie() }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "失败了");
+      setError(e instanceof Error ? e.message : t("common.failed"));
     } finally {
       setLoading(false);
     }
@@ -33,21 +35,21 @@ export default function RewritePage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-semibold tracking-tight">改写</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{t("rewrite.title")}</h1>
       <input
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://example.com(示例,永远可达)/ x.com / 小红书 / B 站 / 公众号"
+        placeholder={t("rewrite.placeholder")}
         className="h-11 rounded-xl border border-line bg-card px-4 text-sm outline-none focus:border-accent"
       />
       <XhsHint text={url} />
       <PlatformPicker value={platforms} onChange={setPlatforms} />
       <Button onClick={run} disabled={loading || !url || platforms.length === 0} className="self-start">
         {loading && <Loader2 className="size-4 animate-spin" />}
-        抓取并改写
+        {t("rewrite.run")}
       </Button>
       {error && <p className="text-sm text-red-500">{error}</p>}
-      {!out && !loading && !error && <EmptyState icon={Link2} title="还没有改写结果" hint="贴一个链接,选好平台,点「抓取并改写」。" />}
+      {!out && !loading && !error && <EmptyState icon={Link2} title={t("rewrite.emptyTitle")} hint={t("rewrite.emptyHint")} />}
       {out && (
         <>
           <SourceCard source={out.source} />

@@ -9,6 +9,7 @@ import { PlatformPicker } from "@/components/platform-picker";
 import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
 import { post } from "@/lib/http";
+import { useT } from "@/lib/use-t";
 import type { Platform, RewriteResult, Source } from "@/lib/types";
 
 const source: Source = {
@@ -71,12 +72,13 @@ const Section = ({ title, children }: { title: string; children: ReactNode }) =>
 );
 
 export default function Showcase() {
+  const t = useT();
   const [platforms, setPlatforms] = useState<Platform[]>(["xhs"]);
   return (
     <div className="space-y-10">
-      <h1 className="text-3xl font-semibold tracking-tight">组件预览</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">{t("showcase.title")}</h1>
       <Link href="/search" className="text-sm text-accent underline">
-        语义搜索 demo →
+        {t("showcase.search")}
       </Link>
       <Section title="Button">
         <div className="flex gap-2">

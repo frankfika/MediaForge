@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { post } from "@/lib/http";
 import { cosineSim } from "@/lib/embed";
+import { useT } from "@/lib/use-t";
 import { cn } from "@/lib/utils";
 
 const DOCS = [
@@ -13,6 +14,7 @@ const DOCS = [
 ];
 
 export default function SearchPage() {
+  const t = useT();
   const [query, setQuery] = useState("怎么改写文章");
   const [vecs, setVecs] = useState<{ q: number[]; docs: number[][] } | null>(null);
   const [error, setError] = useState("");
@@ -20,14 +22,14 @@ export default function SearchPage() {
 
   useEffect(() => {
     // debounce so typing doesn't fire a request per keystroke
-    const t = setTimeout(
+    const timer = setTimeout(
       () =>
         post<{ embeddings: number[][] }>("/api/embed", { texts: [query, ...DOCS] })
           .then(({ embeddings: [q = [], ...docs] }) => (setVecs({ q, docs }), setError("")))
-          .catch((e) => setError(e instanceof Error ? e.message : "失败了")),
+          .catch((e) => setError(e instanceof Error ? e.message : "failed")),
       250,
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [query]);
 
   const ranked = DOCS.map((text, i) => ({ text, i, score: vecs ? cosineSim(vecs.q, vecs.docs[i] ?? []) : 0 })).sort(
@@ -36,15 +38,15 @@ export default function SearchPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-semibold tracking-tight">语义搜索</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{t("search.title")}</h1>
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        aria-label="查询"
-        placeholder="输入查询"
+        aria-label={t("search.query")}
+        placeholder={t("search.placeholder")}
         className="h-10 rounded-lg border border-line bg-card px-3 text-sm outline-none focus:border-accent"
       />
-      <p className="text-xs text-muted">演示用 mock 向量(确定性哈希,非真实语义),排序仅展示流程;接入真实 embedding 后即为语义排序。</p>
+      <p className="text-xs text-muted">{t("search.note")}</p>
       {error && <p className="text-sm text-red-500">{error}</p>}
       <ul className="flex flex-col gap-2">
         {ranked.map((d) => (
