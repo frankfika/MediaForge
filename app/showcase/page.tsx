@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { Chat } from "@/components/chat";
 import { EmptyState } from "@/components/empty-state";
 import { LlmModePill } from "@/components/llm-mode-badge";
+import { Onboarding } from "@/components/onboarding";
 import { PlatformPicker } from "@/components/platform-picker";
 import { PostTabs, SourceCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ export default function Showcase() {
   const [platforms, setPlatforms] = useState<Platform[]>(["xhs"]);
   return (
     <div className="space-y-10">
+      <Onboarding />
       <h1 className="text-3xl font-semibold tracking-tight">{t("showcase.title")}</h1>
       <Link href="/search" className="text-sm text-accent underline">
         {t("showcase.search")}

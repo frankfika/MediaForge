@@ -103,6 +103,18 @@ export const zh = {
   "showcase.title": "组件预览",
   "showcase.search": "语义搜索 demo →",
 
+  "firstRun.title": "欢迎使用 MediaForge!",
+  "firstRun.subtitle": "三个步骤立刻开始",
+  "firstRun.step1.title": "加载演示风格",
+  "firstRun.step1.desc": "点击「加载演示风格」,看 AI 学习你的声音。",
+  "firstRun.step2.title": "试试语义搜索",
+  "firstRun.step2.desc": "搜索 5 篇示例文档,看 cosine 排序。",
+  "firstRun.step3.title": "看组件预览",
+  "firstRun.step3.desc": "/showcase 有 6 个组件,Button / PostCard / Chat / LlmModeBadge 等。",
+  "firstRun.step4.title": "接 MCP server",
+  "firstRun.step4.desc": "用 Claude Code / Cursor / Codex 调用 mediaforge 工具。",
+  "firstRun.dismiss": "我知道了",
+
   "styles.title": "风格",
   "styles.loadDemo": "加载演示风格",
   "styles.storage": "存储",
@@ -267,6 +279,18 @@ export const en: Record<Key, string> = {
 
   "showcase.title": "Component preview",
   "showcase.search": "Semantic search demo →",
+
+  "firstRun.title": "Welcome to MediaForge!",
+  "firstRun.subtitle": "Get started in three steps",
+  "firstRun.step1.title": "Load demo styles",
+  "firstRun.step1.desc": 'Click "Load demo styles" and watch the AI learn your voice.',
+  "firstRun.step2.title": "Try semantic search",
+  "firstRun.step2.desc": "Search 5 sample docs and see cosine ranking.",
+  "firstRun.step3.title": "Browse the showcase",
+  "firstRun.step3.desc": "/showcase has 6 components: Button / PostCard / Chat / LlmModeBadge, and more.",
+  "firstRun.step4.title": "Connect the MCP server",
+  "firstRun.step4.desc": "Call mediaforge tools from Claude Code / Cursor / Codex.",
+  "firstRun.dismiss": "Got it",
 
   "styles.title": "Styles",
   "styles.loadDemo": "Load demo styles",

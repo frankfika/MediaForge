@@ -12,6 +12,6 @@ test("search: query -> ranked doc cards, click shows 64-dim vector", async ({ pa
 
 test("showcase links to /search", async ({ page }) => {
   await page.goto("/showcase");
-  await page.getByRole("link", { name: /语义搜索/ }).click();
+  await page.getByRole("link", { name: /语义搜索 demo/ }).click();
   await expect(page).toHaveURL(/\/search$/);
 });
