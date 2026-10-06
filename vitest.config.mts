@@ -21,6 +21,7 @@ export default defineConfig({
         "lib/styles-sync.ts": { lines: 85 },
         "lib/styles-store.ts": { lines: 90, branches: 90 },
         "lib/cookie.ts": { lines: 90, branches: 90 },
+        "lib/llm.ts": { lines: 90, branches: 90 },
         "lib/utils.ts": { lines: 100 },
       },
     },

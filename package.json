@@ -23,6 +23,7 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "lint": "eslint .",
+    "test:xhs": "node --import tsx scripts/test-xhs-fetch.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

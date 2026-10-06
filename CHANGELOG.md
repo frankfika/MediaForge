@@ -2,6 +2,20 @@
 
 Format: [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `pnpm test:xhs` real-network XHS fetch script and `docs/xhs-cookie-test.md`.
+- Prettier applied repo-wide; `llm.ts` per-file coverage threshold (90% lines/branches).
+
+### Planned (v0.2)
+
+- Real LLM integration verification (Anthropic path end to end, beyond the mock).
+- Full blind-test loop for style learning (learn -> generate -> blind compare -> refine).
+- Higher success rate for XHS fetches with a real login session.
+- i18n (UI is zh-CN only today).
+
 ## [0.1.0] - 2026-10-06
 
 ### Added

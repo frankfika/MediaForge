@@ -82,4 +82,30 @@ describe("llm seam", () => {
     vi.unstubAllEnvs();
     vi.doUnmock("./ai");
   });
+
+  it("take: stops at limit, clips a single oversized sentence; no hashtag when text has no words", async () => {
+    const x = (text: string) => mock.rewrite({ source: { ...source, text }, platforms: ["x"] }).then((r) => r.posts[0]!.body);
+    expect(await x("短句。" + "长".repeat(300) + "。")).not.toContain("长".repeat(50));
+    expect(await x("长".repeat(300))).toContain("…");
+    expect(await x("1 2 3。")).not.toContain("#");
+  });
+  it("learnStyle: identical-word samples give one vocabulary entry; medium rhythm", async () => {
+    const p = await mock.learnStyle(["苹果苹果。", "苹果苹果。"]);
+    expect(p.features.vocabulary).toEqual(["苹果苹果"]);
+    expect((await mock.learnStyle(["字".repeat(30) + "。"])).features.rhythm).toContain("medium");
+  });
+  it("refineStyle: feedback + original/edited both land in rules", async () => {
+    const r = await mock.refineStyle({ style, feedback: "更短", original: "一。二。", edited: "一。" });
+    expect(r.changelog).toHaveLength(2);
+    expect(r.prompt).toContain("User feedback: 更短");
+    expect(r.prompt).toContain("merge and shorten");
+  });
+  it("seam dispatches to mock without a key", async () => {
+    vi.resetModules();
+    vi.stubEnv("ANTHROPIC_API_KEY", "");
+    const m = await import("./llm");
+    expect((await m.rewrite({ source, platforms: ["x"] })).posts).toHaveLength(1);
+    expect((await m.learnStyle(["a。"])).prompt).not.toBe("");
+    expect(await m.refineStyle({ style, feedback: "f" })).toHaveProperty("changelog");
+  });
 });
