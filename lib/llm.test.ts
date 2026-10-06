@@ -2,7 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 import { mock } from "./llm";
 import type { Source } from "./types";
 
-const source: Source = { url: "https://example.com", title: "Example Domain", author: "", text: "这是第一句话。这是第二句话!Example domain for illustrative examples.", images: [], videos: [] };
+const source: Source = {
+  url: "https://example.com",
+  title: "Example Domain",
+  author: "",
+  text: "这是第一句话。这是第二句话!Example domain for illustrative examples.",
+  images: [],
+  videos: [],
+};
 
 describe("mock llm", () => {
   it("rewrite is deterministic", async () => {

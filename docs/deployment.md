@@ -2,27 +2,27 @@
 
 ## 必备环境
 
-| 服务 | 必需? | 用途 |
-|---|---|---|
+| 服务              | 必需?        | 用途                                                           |
+| ----------------- | ------------ | -------------------------------------------------------------- |
 | Anthropic API key | 生产建议必需 | 真实 LLM;缺省走确定性 mock(`/api/health` 返回 `"llm": "mock"`) |
-| Neon Postgres | 可选 | 风格云同步 / 版本回滚;缺省只用浏览器 localStorage |
-| Firecrawl | 可选 | 登录墙页面(小红书、公众号)兜底抓取 |
-| Jina | 可选 / 预留 | `JINA_API_KEY` 目前**代码未读取**,仅为后续 Reader 抓取预留 |
+| Neon Postgres     | 可选         | 风格云同步 / 版本回滚;缺省只用浏览器 localStorage              |
+| Firecrawl         | 可选         | 登录墙页面(小红书、公众号)兜底抓取                             |
+| Jina              | 可选 / 预留  | `JINA_API_KEY` 目前**代码未读取**,仅为后续 Reader 抓取预留     |
 
 运行时:Node 22,pnpm 10。
 
 ## Vercel(约 5 分钟)
 
-1. Fork / push 到 GitHub,在 Vercel 点 *Add New → Project* 导入仓库(自动识别 Next.js)。
+1. Fork / push 到 GitHub,在 Vercel 点 _Add New → Project_ 导入仓库(自动识别 Next.js)。
 2. Build command `pnpm build`,Output 默认(`.next`),Install `pnpm install --frozen-lockfile`。
 3. 配置环境变量:
 
-| 变量 | 说明 |
-|---|---|
-| `ANTHROPIC_API_KEY` | 真实 LLM |
-| `ANTHROPIC_MODEL` | 默认 `claude-sonnet-4-5` |
-| `DATABASE_URL` | Neon 连接串(可选) |
-| `FIRECRAWL_API_KEY` | 兜底抓取(可选) |
+| 变量                | 说明                     |
+| ------------------- | ------------------------ |
+| `ANTHROPIC_API_KEY` | 真实 LLM                 |
+| `ANTHROPIC_MODEL`   | 默认 `claude-sonnet-4-5` |
+| `DATABASE_URL`      | Neon 连接串(可选)        |
+| `FIRECRAWL_API_KEY` | 兜底抓取(可选)           |
 
 4. Deploy。打开 `/api/health` 确认 `llm` 字段。
 

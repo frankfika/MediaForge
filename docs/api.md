@@ -12,7 +12,10 @@ type Source = { url: string; title: string; author: string; text: string; images
 type PlatformPost = { platform: Platform; title?: string; body: string };
 type RewriteResult = { media: { images: string[]; videos: string[] }; posts: PlatformPost[] };
 type StyleRef = { id: string; name: string; prompt: string; version?: number };
-type Style = StyleRef & { version: number; features?: { avgSentenceLength: number; vocabulary: string[]; rhythm: string; devices: string[]; taboos: string[] } };
+type Style = StyleRef & {
+  version: number;
+  features?: { avgSentenceLength: number; vocabulary: string[]; rhythm: string; devices: string[]; taboos: string[] };
+};
 ```
 
 ## POST `/api/chat` — 对话 agent(流式)
@@ -52,8 +55,7 @@ Agent 工具:`fetch_link({url}) → Source`,`rewrite_post({url, platforms, instr
 ## POST `/api/style/learn` — 学习风格
 
 ```jsonc
-{ "name": "我的号",
-  "samples": ["https://…", "正文文本…"] }       // 1–10;单条为 URL 则抓取,否则当正文
+{ "name": "我的号", "samples": ["https://…", "正文文本…"] } // 1–10;单条为 URL 则抓取,否则当正文
 // 200: Style (v1);id 由服务端生成,持久化由客户端/Phase 2 服务端负责
 ```
 
@@ -72,27 +74,38 @@ Agent 工具:`fetch_link({url}) → Source`,`rewrite_post({url, platforms, instr
 所有路由:需 `DATABASE_URL`,否则 `503 {code:"NO_DB"}`;连接/查询失败 `503 {code:"DB_UNAVAILABLE"}`(客户端据此降级到 localStorage);不存在 `404`。用户由 `x-user-id` 头(uuid,缺省为内置默认用户)标识。
 
 ### GET `/api/styles` — 列表
+
 ```jsonc
 // 200: ApiStyle[]  (不含 versions)
 [{ "id": "uuid", "name": "极简技术流", "currentVersion": 2, "prompt": "…", "features": {…} | null, "createdAt": "ISO" }]
 ```
+
 ### POST `/api/styles` — 创建
+
 ```jsonc
 { "id": "uuid?", "name": "…", "prompt": "…", "features": {…}? }  // 同 id 重复上传为幂等 no-op
 // 200: ApiStyle (含 versions)
 ```
+
 ### GET `/api/styles/:id` — 单个
+
 ```jsonc
 // 200: ApiStyle + versions: [{ version, prompt, features, changelog, createdAt }]  (新→旧)
 ```
+
 (同路径 `DELETE` → `{ ok: true }`)
+
 ### POST `/api/styles/:id/refine` — 修正并追加版本
+
 ```jsonc
-{ "feedback": "太正式", "original": "…", "edited": "…" }   // feedback 或 original+edited 至少其一,否则 400
+{ "feedback": "太正式", "original": "…", "edited": "…" } // feedback 或 original+edited 至少其一,否则 400
 // 200: { "style": ApiStyle /* currentVersion = max+1 */, "changelog": ["+ …"] }
 ```
+
 无 `ANTHROPIC_API_KEY` 时走 mock LLM。
+
 ### POST `/api/styles/:id/rollback` — 回滚
+
 ```jsonc
 { "version": 1 }
 // 200: ApiStyle (currentVersion=1;历史保留,下次 refine 仍是 max+1);版本不存在 404

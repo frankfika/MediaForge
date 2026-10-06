@@ -10,9 +10,7 @@ export const maxDuration = 120;
 export const POST = route(
   z.object({ name: z.string().min(1).max(60), samples: z.array(z.string().min(1)).min(1).max(10) }),
   async ({ name, samples }): Promise<Style> => {
-    const texts = await Promise.all(
-      samples.map(async (s) => (/^https?:\/\/\S+$/.test(s.trim()) ? (await fetchLink(s.trim())).text : s)),
-    );
+    const texts = await Promise.all(samples.map(async (s) => (/^https?:\/\/\S+$/.test(s.trim()) ? (await fetchLink(s.trim())).text : s)));
     const { prompt, features } = await learnStyle(texts);
     return { id: crypto.randomUUID(), name, prompt, features, version: 1 };
   },

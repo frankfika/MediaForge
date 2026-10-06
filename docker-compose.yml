@@ -5,10 +5,10 @@ services:
     build: .
     ports: ["3000:3000"]
     environment:
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}   # empty -> mock LLM
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-} # empty -> mock LLM
       ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-4-5}
       FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
-      DATABASE_URL: ${DATABASE_URL:-}              # set to postgres://mf:mf@db:5432/mediaforge with --profile db
+      DATABASE_URL: ${DATABASE_URL:-} # set to postgres://mf:mf@db:5432/mediaforge with --profile db
   db:
     profiles: [db]
     image: postgres:16

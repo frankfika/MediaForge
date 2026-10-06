@@ -19,7 +19,11 @@ export function parseImport(json: string): Style[] {
   } catch {
     return [];
   }
-  const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" && Array.isArray((raw as { styles?: unknown }).styles) ? (raw as { styles: unknown[] }).styles : [raw];
+  const list = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === "object" && Array.isArray((raw as { styles?: unknown }).styles)
+      ? (raw as { styles: unknown[] }).styles
+      : [raw];
   const seen = new Set<string>();
   return list.flatMap((item) => {
     const r = ImportSchema.safeParse(item);

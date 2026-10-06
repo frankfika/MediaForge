@@ -51,8 +51,15 @@ export async function getStyle(db: Db, userId: string, id: string): Promise<ApiS
 
 export async function createStyle(db: Db, userId: string, req: CreateStyleRequest): Promise<ApiStyle> {
   const id = await db.transaction(async (tx) => {
-    await tx.insert(users).values({ id: userId, email: `${userId}@mock.local` }).onConflictDoNothing();
-    const [s] = await tx.insert(styles).values({ ...(req.id && { id: req.id }), userId, name: req.name }).onConflictDoNothing().returning();
+    await tx
+      .insert(users)
+      .values({ id: userId, email: `${userId}@mock.local` })
+      .onConflictDoNothing();
+    const [s] = await tx
+      .insert(styles)
+      .values({ ...(req.id && { id: req.id }), userId, name: req.name })
+      .onConflictDoNothing()
+      .returning();
     // Same id uploaded twice (retry / second device) is a no-op, not a duplicate.
     if (s) await tx.insert(styleVersions).values({ styleId: s.id, version: 1, prompt: req.prompt, features: req.features });
     return s?.id ?? req.id!;
@@ -70,9 +77,15 @@ export async function addVersion(db: Db, userId: string, id: string, v: { prompt
   const ok = await db.transaction(async (tx) => {
     const [s] = await tx.select().from(styles).where(owned(userId, id));
     if (!s) return false;
-    const [row] = await tx.select({ top: max(styleVersions.version) }).from(styleVersions).where(eq(styleVersions.styleId, id));
+    const [row] = await tx
+      .select({ top: max(styleVersions.version) })
+      .from(styleVersions)
+      .where(eq(styleVersions.styleId, id));
     const top = row?.top;
-    const [prev] = await tx.select().from(styleVersions).where(and(eq(styleVersions.styleId, id), eq(styleVersions.version, s.currentVersion)));
+    const [prev] = await tx
+      .select()
+      .from(styleVersions)
+      .where(and(eq(styleVersions.styleId, id), eq(styleVersions.version, s.currentVersion)));
     const version = (top ?? 0) + 1;
     await tx.insert(styleVersions).values({ styleId: id, version, prompt: v.prompt, features: prev?.features, changelog: v.changelog });
     await tx.update(styles).set({ currentVersion: version }).where(eq(styles.id, id));
@@ -97,7 +110,10 @@ export async function rollbackStyle(db: Db, userId: string, id: string, version:
  * 404 when the handler returns null. The client treats 5xx as "degrade to localStorage".
  */
 export const styleRoute =
-  <S extends z.ZodTypeAny = z.ZodUndefined>(schema: S | null, fn: (c: { db: Db; userId: string; id: string; body: z.infer<S> }) => Promise<unknown>) =>
+  <S extends z.ZodTypeAny = z.ZodUndefined>(
+    schema: S | null,
+    fn: (c: { db: Db; userId: string; id: string; body: z.infer<S> }) => Promise<unknown>,
+  ) =>
   async (req: Request, ctx: { params: Promise<{ id?: string }> }): Promise<Response> => {
     const db = getDb();
     if (!db) return Response.json({ error: "DATABASE_URL is not set", code: "NO_DB" }, { status: 503 });

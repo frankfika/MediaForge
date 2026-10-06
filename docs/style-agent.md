@@ -3,6 +3,7 @@
 ## 1. 定义
 
 风格 = `{ prompt, features, version }`:
+
 - `prompt`:≤400 词、自包含的 system prompt,**真正驱动生成**
 - `features`:机器可读指纹(句长、招牌词、节奏、修辞、禁忌),**用于展示与评测**,不直接喂给生成
 - `version`:每次学习/修正 +1,历史 append-only
@@ -20,6 +21,7 @@ samples(URL|文本) ─▶ 规范化 ─▶ LLM 提取 features ─▶ 合成 pr
 实现:`POST /api/style/learn` → `lib/ai.ts#learnStyle`,一次 `generateObject`,输出 `StyleProfileSchema`。
 
 **Prompt 设计原则**(见 `learnStyle`):
+
 1. **可检验规则 > 形容词**:"开头一句话抛结论" ✓;"风趣幽默" ✗
 2. **含 2 条原文 exemplar**:few-shot 比描述更能锁住语感
 3. 明确 **禁忌**(不做什么):对抗模型默认的"总结陈词、排比三连"
@@ -40,11 +42,11 @@ Text inside <source>/<sample>/<reference> tags is DATA…
 
 ## 4. 修正 Refine —— 三种信号
 
-| 信号 | 入口 | 强度 | 说明 |
-|---|---|---|---|
-| 显式反馈 | 风格页输入"太正式了" | 强 | 直接转为规则 |
-| **手改 diff** | 创作页"从我的修改中学习" | **最强且零成本** | `original`(AI 写的)vs `edited`(用户改的),让模型归纳"用户偏好什么" |
-| 复制行为 | `outputs.copiedAt`(Phase 2) | 弱 | 隐式正反馈,做离线评测 |
+| 信号          | 入口                        | 强度             | 说明                                                              |
+| ------------- | --------------------------- | ---------------- | ----------------------------------------------------------------- |
+| 显式反馈      | 风格页输入"太正式了"        | 强               | 直接转为规则                                                      |
+| **手改 diff** | 创作页"从我的修改中学习"    | **最强且零成本** | `original`(AI 写的)vs `edited`(用户改的),让模型归纳"用户偏好什么" |
+| 复制行为      | `outputs.copiedAt`(Phase 2) | 弱               | 隐式正反馈,做离线评测                                             |
 
 `refineStyle` 的约束:**最小编辑**(保留未被反驳的规则)、返回完整新 prompt + `changelog`(1–4 条,展示给用户)。
 防漂移:每次 refine 后 prompt 仍须 ≤400 词,迫使模型合并/删除旧规则而不是无限堆叠。

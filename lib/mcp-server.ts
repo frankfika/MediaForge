@@ -6,18 +6,25 @@ import { fetchLink } from "./fetcher";
 import { compose, learnStyle, llmMode, refineStyle, rewrite } from "./llm";
 import { PlatformSchema, StyleRefSchema, type Style } from "./types";
 
-const json = (v: unknown) => ({ content: [{ type: "text" as const, text: JSON.stringify({ llm: llmMode(), ...(v as object) }, null, 2) }] });
+const json = (v: unknown) => ({
+  content: [{ type: "text" as const, text: JSON.stringify({ llm: llmMode(), ...(v as object) }, null, 2) }],
+});
 const fail = (e: unknown) => ({ isError: true, content: [{ type: "text" as const, text: e instanceof Error ? e.message : String(e) }] });
-const safe = <A>(fn: (a: A) => Promise<unknown>) => async (a: A) => {
-  try {
-    return json(await fn(a));
-  } catch (e) {
-    return fail(e);
-  }
-};
+const safe =
+  <A>(fn: (a: A) => Promise<unknown>) =>
+  async (a: A) => {
+    try {
+      return json(await fn(a));
+    } catch (e) {
+      return fail(e);
+    }
+  };
 
-const style = StyleRefSchema.partial({ id: true, version: true }).optional().describe("Style to write in: {name, prompt}, as returned by learn_style");
-const asRef = (s?: { id?: string; name: string; prompt: string; version?: number }) => s && { id: s.id ?? "mcp", name: s.name, prompt: s.prompt, version: s.version ?? 1 };
+const style = StyleRefSchema.partial({ id: true, version: true })
+  .optional()
+  .describe("Style to write in: {name, prompt}, as returned by learn_style");
+const asRef = (s?: { id?: string; name: string; prompt: string; version?: number }) =>
+  s && { id: s.id ?? "mcp", name: s.name, prompt: s.prompt, version: s.version ?? 1 };
 
 export function createServer() {
   const server = new McpServer({ name: "mediaforge", version: "0.1.0" });
@@ -25,7 +32,8 @@ export function createServer() {
   server.registerTool(
     "rewrite_url",
     {
-      description: "Fetch a link (X, Xiaohongshu, Bilibili, WeChat, any article) and rewrite it for the given platforms. Media is passed through untouched.",
+      description:
+        "Fetch a link (X, Xiaohongshu, Bilibili, WeChat, any article) and rewrite it for the given platforms. Media is passed through untouched.",
       inputSchema: {
         url: z.string().url(),
         platforms: z.array(PlatformSchema).min(1).describe("wechat | x | xhs | bilibili"),
@@ -52,7 +60,9 @@ export function createServer() {
       },
     },
     safe(async ({ topic, platform, links = [], style }) => {
-      const references = (await Promise.allSettled(links.map((l) => fetchLink(l)))).flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+      const references = (await Promise.allSettled(links.map((l) => fetchLink(l)))).flatMap((r) =>
+        r.status === "fulfilled" ? [r.value] : [],
+      );
       return { text: await compose({ topic, platform, style: asRef(style), references }) };
     }),
   );
@@ -60,7 +70,8 @@ export function createServer() {
   server.registerTool(
     "learn_style",
     {
-      description: "Learn a writing style from samples (URLs or raw text). Returns a Style whose `prompt` can be passed to the other tools.",
+      description:
+        "Learn a writing style from samples (URLs or raw text). Returns a Style whose `prompt` can be passed to the other tools.",
       inputSchema: { name: z.string().min(1).max(60), samples: z.array(z.string().min(1)).min(1).max(10) },
     },
     safe(async ({ name, samples }) => {

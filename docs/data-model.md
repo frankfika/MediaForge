@@ -9,14 +9,14 @@ users ─┬─< styles ─┬─< style_versions   (append-only: prompt, featur
                  └── styleId? (set null on style delete)
 ```
 
-| 表 | 关键字段 | 说明 |
-|---|---|---|
-| `users` | id, email | 登录后启用 |
-| `styles` | id, userId, name, currentVersion | 风格主记录 |
-| `style_versions` | styleId, version, **prompt**, features(jsonb), changelog | 每次 learn/refine 追加;回滚 = 把 currentVersion 指回旧版本 |
-| `style_samples` | styleId, sourceUrl?, text | 保留样本以便重新学习/评测 |
-| `articles` | userId, styleId?, mode(`rewrite`\|`compose`), sourceUrl, source(jsonb), draft | 一次创作任务 |
-| `outputs` | articleId, platform(enum), title?, body, media(jsonb), **copiedAt** | 每平台一条;`copiedAt` 是隐式质量信号 |
+| 表               | 关键字段                                                                      | 说明                                                       |
+| ---------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `users`          | id, email                                                                     | 登录后启用                                                 |
+| `styles`         | id, userId, name, currentVersion                                              | 风格主记录                                                 |
+| `style_versions` | styleId, version, **prompt**, features(jsonb), changelog                      | 每次 learn/refine 追加;回滚 = 把 currentVersion 指回旧版本 |
+| `style_samples`  | styleId, sourceUrl?, text                                                     | 保留样本以便重新学习/评测                                  |
+| `articles`       | userId, styleId?, mode(`rewrite`\|`compose`), sourceUrl, source(jsonb), draft | 一次创作任务                                               |
+| `outputs`        | articleId, platform(enum), title?, body, media(jsonb), **copiedAt**           | 每平台一条;`copiedAt` 是隐式质量信号                       |
 
 ## 约束与决策
 

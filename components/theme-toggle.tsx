@@ -2,7 +2,11 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 
-export const THEMES = [["light", "浅色"], ["dark", "深色"], ["system", "跟随系统"]] as const;
+export const THEMES = [
+  ["light", "浅色"],
+  ["dark", "深色"],
+  ["system", "跟随系统"],
+] as const;
 type Theme = (typeof THEMES)[number][0];
 const KEY = "mediaforge.theme";
 const listeners = new Set<() => void>();
@@ -12,7 +16,8 @@ const read = (): Theme => {
   return v === "light" || v === "dark" ? v : "system";
 };
 /** "system" = no attribute, so the prefers-color-scheme media query in globals.css decides. */
-const apply = (t: Theme) => (t === "system" ? document.documentElement.removeAttribute("data-theme") : document.documentElement.setAttribute("data-theme", t));
+const apply = (t: Theme) =>
+  t === "system" ? document.documentElement.removeAttribute("data-theme") : document.documentElement.setAttribute("data-theme", t);
 const subscribe = (l: () => void) => {
   listeners.add(l);
   return () => void listeners.delete(l);
@@ -34,7 +39,9 @@ export function ThemeToggle() {
   return (
     <div role="group" aria-label="主题" className="flex gap-2">
       {THEMES.map(([t, label]) => (
-        <Button key={t} size="sm" variant={theme === t ? "primary" : "outline"} aria-pressed={theme === t} onClick={() => set(t)}>{label}</Button>
+        <Button key={t} size="sm" variant={theme === t ? "primary" : "outline"} aria-pressed={theme === t} onClick={() => set(t)}>
+          {label}
+        </Button>
       ))}
     </div>
   );

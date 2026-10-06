@@ -27,7 +27,10 @@ const subscribe = (l: () => void) => {
 
 export const upsertStyle = (s: Style) => {
   const { styles, active } = parse();
-  write({ styles: styles.some((x) => x.id === s.id) ? styles.map((x) => (x.id === s.id ? s : x)) : [...styles, s], active: active ?? s.id });
+  write({
+    styles: styles.some((x) => x.id === s.id) ? styles.map((x) => (x.id === s.id ? s : x)) : [...styles, s],
+    active: active ?? s.id,
+  });
 };
 export const removeStyle = (id: string) => {
   const { styles, active } = parse();

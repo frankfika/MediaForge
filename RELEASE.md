@@ -3,12 +3,14 @@
 Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in your own voice. Works with zero config via a mock LLM; set `ANTHROPIC_API_KEY` for real output.
 
 ## Highlights
+
 - **Rewrite** any URL into 4 platforms, with export (WeChat inline HTML, txt/Markdown, ZIP).
 - **Styles**: learn a voice from samples, refine, version, roll back, optional Postgres sync.
 - **Style judge** (new): deterministic scoring of a text against a style — sentence length, vocabulary, rhythm, sentence count, taboos. No LLM needed.
 - **MCP server**, ⌘K chat drawer, `/showcase`, Playwright e2e, CI.
 
 ## Commits
+
 1. `74d52ae` R2 — skeleton: Next.js 15 / Tailwind v4 / cva UI, 5 pages
 2. `40bcceb` R3 — export pipeline, ⌘K drawer, Firecrawl fallback, DB client
 3. `814ef66` R4 — cloud styles + rollback, MCP server, XHS cookie settings
@@ -27,13 +29,16 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 16. `e028960` R17 (tag) — ai.ts 100% + llm/style-transfer 95%+ + ESLint flat config + Prettier (overall 92%→98%)
 
 ## Known limits
+
 - The judge is heuristic (char-bigram vocabulary, S/M/L rhythm); the LLM blind-test loop in `docs/style-agent.md` §6 is not implemented.
 - Without references, the judge synthesizes one from the style's features, so scores are indicative only.
 
 ## Thanks
+
 Built with Next.js, Tailwind, Vercel AI SDK, Drizzle, Motion, Vitest and Playwright. Thanks to everyone who files issues.
 
 ## Cutting a release
+
 `.github/workflows/release.yml` runs typecheck + test + build, then publishes a GitHub Release whose notes are the matching `## [x.y.z]` section of `CHANGELOG.md`, with a source tarball attached.
 
 ```bash
@@ -41,7 +46,8 @@ git remote add origin git@github.com:frankfika/MediaForge.git   # once
 git push -u origin main
 git push origin v0.1.0        # or: git push --tags  → triggers the release
 ```
+
 Re-run for an existing tag: Actions → Release → Run workflow → enter `v0.1.0`.
-Add a `## [x.y.z]` section to CHANGELOG.md *before* tagging, or the workflow fails.
+Add a `## [x.y.z]` section to CHANGELOG.md _before_ tagging, or the workflow fails.
 
 GitHub Social Preview: upload `docs/assets/social-preview.png` (1280×640) at Settings → Social preview. Regenerate with `node scripts/og-image.mjs`.

@@ -84,7 +84,7 @@ describe("refineStyle", () => {
     expect(await refineStyle({ style, feedback: "shorter" })).toEqual(out);
     const { prompt } = lastCall(generateObject);
     expect(prompt).toContain("User feedback: shorter");
-    expect(prompt).not.toContain("kind=\"original\"");
+    expect(prompt).not.toContain('kind="original"');
   });
   it("original+edited only, truncated", async () => {
     await refineStyle({ style, original: "o".repeat(9000), edited: "e" });

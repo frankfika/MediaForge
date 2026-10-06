@@ -12,7 +12,15 @@ import { replaceStyles } from "./styles-store";
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const st = (id: string, extra = {}) => ({ id, name: id, prompt: `p-${id}`, version: 1, ...extra });
-const api = (id: string, extra = {}) => ({ id, name: id, currentVersion: 3, prompt: `cloud-${id}`, features: undefined, createdAt: "2024-01-01", ...extra });
+const api = (id: string, extra = {}) => ({
+  id,
+  name: id,
+  currentVersion: 3,
+  prompt: `cloud-${id}`,
+  features: undefined,
+  createdAt: "2024-01-01",
+  ...extra,
+});
 const local = () => JSON.parse(localStorage.getItem("mediaforge.styles")!).styles.map((s: { id: string }) => s.id);
 
 let routes: Record<string, (init: RequestInit) => { status?: number; body?: unknown } | Error>;
@@ -47,7 +55,9 @@ describe("mode + syncNow", () => {
     replaceStyles([st("local-only") as never, st("s1") as never]);
     await goDb([api("s1"), api("s2")]);
     expect(local().sort()).toEqual(["local-only", "s1", "s2"]);
-    expect(JSON.parse(localStorage.getItem("mediaforge.styles")!).styles.find((s: { id: string }) => s.id === "s1").prompt).toBe("cloud-s1");
+    expect(JSON.parse(localStorage.getItem("mediaforge.styles")!).styles.find((s: { id: string }) => s.id === "s1").prompt).toBe(
+      "cloud-s1",
+    );
   });
   it("5xx degrades to local with warning, keeps local data", async () => {
     replaceStyles([st("a") as never]);

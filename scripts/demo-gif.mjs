@@ -6,13 +6,20 @@ import { chromium } from "@playwright/test";
 const BASE = "http://localhost:3000";
 const OUT = "docs/assets";
 const TMP = "docs/assets/.rec";
-const up = () => fetch(`${BASE}/api/health`).then((r) => r.ok, () => false);
+const up = () =>
+  fetch(`${BASE}/api/health`).then(
+    (r) => r.ok,
+    () => false,
+  );
 
 let server;
 if (!(await up())) {
   server = spawn("pnpm", ["dev"], { stdio: "ignore", detached: true });
   for (let i = 0; i < 120 && !(await up()); i++) await new Promise((r) => setTimeout(r, 1000));
-  if (!(await up())) { process.kill(-server.pid); throw new Error("dev server did not start"); }
+  if (!(await up())) {
+    process.kill(-server.pid);
+    throw new Error("dev server did not start");
+  }
 }
 
 const browser = await chromium.launch();
@@ -48,8 +55,17 @@ try {
   if (server) process.kill(-server.pid);
 }
 
-execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-t", "8", "-i", `${OUT}/demo.webm`,
-  "-vf", "fps=10,scale=800:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4",
-  `${OUT}/demo.gif`]);
+execFileSync("ffmpeg", [
+  "-y",
+  "-loglevel",
+  "error",
+  "-t",
+  "8",
+  "-i",
+  `${OUT}/demo.webm`,
+  "-vf",
+  "fps=10,scale=800:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4",
+  `${OUT}/demo.gif`,
+]);
 rmSync(`${OUT}/demo.webm`);
 console.log(`demo.gif ${(statSync(`${OUT}/demo.gif`).size / 1024).toFixed(0)} KB`);

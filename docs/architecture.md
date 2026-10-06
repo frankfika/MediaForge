@@ -27,13 +27,13 @@
 
 ## 3. 后端路由
 
-| 路由 | 类型 | 说明 |
-|---|---|---|
-| `POST /api/chat` | 流式 agent | 默认入口,tool-use 循环(≤6 步) |
-| `POST /api/rewrite` | JSON | 改写模式的确定性入口(URL 或 source) |
-| `POST /api/compose` | 文本流 | 创作模式 |
-| `POST /api/style/learn` | JSON | 样本 → 风格 |
-| `POST /api/style/refine` | JSON | 反馈/手改 → 新版本风格 |
+| 路由                     | 类型       | 说明                                |
+| ------------------------ | ---------- | ----------------------------------- |
+| `POST /api/chat`         | 流式 agent | 默认入口,tool-use 循环(≤6 步)       |
+| `POST /api/rewrite`      | JSON       | 改写模式的确定性入口(URL 或 source) |
+| `POST /api/compose`      | 文本流     | 创作模式                            |
+| `POST /api/style/learn`  | JSON       | 样本 → 风格                         |
+| `POST /api/style/refine` | JSON       | 反馈/手改 → 新版本风格              |
 
 所有路由经 `lib/http.ts#route`:zod 校验 → handler → 统一 `{error}`。
 **同一份核心逻辑两个入口**:`lib/ai.ts#rewrite` 既被 `/api/rewrite` 调用,也是 `/api/chat` 里 `rewrite_post` 工具的实现 —— 对话与表单永远行为一致。
@@ -43,6 +43,7 @@
 选 **AI SDK v5 tool-use**,不用 LangGraph:流程是"抓取 → 改写"的短线性链,模型自己决定调用顺序即可;没有需要持久化的多分支状态机。当出现长时多步任务(例如"学风格→自动试写→自评→迭代 N 轮",见 style-agent §6)再引入 LangGraph 或 Vercel Workflow。
 
 关键约束:
+
 - 工具只收 `url`、不收正文 —— 避免让模型在 tool-call 里复述长文(省 token、防篡改)。`rewrite_post` 内部走 `fetchLink` 的 5 分钟缓存。
 - 工具返回的 `RewriteResult` 只含 `media + posts`,不含原文,下一轮上下文不膨胀。
 - Prompt injection:所有外部文本包在 `<source>/<sample>/<reference>` 标签里,system 声明其为 DATA。
@@ -71,13 +72,13 @@ fetchLink(url)
 MVP:每个平台结果 = `{title?, body}` 纯文本,一键复制;媒体显示缩略图。
 Phase 2 导出管线(纯函数,`lib/render/*`,输入 `PlatformPost + media`):
 
-| 平台 | 产物 |
-|---|---|
+| 平台   | 产物                                                                                                             |
+| ------ | ---------------------------------------------------------------------------------------------------------------- |
 | 公众号 | **内联 CSS 的 HTML**(公众号编辑器会剥离 `<style>`),用 `ClipboardItem('text/html')` 复制后直接粘贴到后台,保留排版 |
-| X | 纯文本(超 280 自动切 thread) |
-| 小红书 | 标题 + 正文 + 话题;图片按顺序编号 |
-| B 站 | Markdown/纯文本 |
-| 全部 | `fflate` 在浏览器内打包 ZIP:`{platform}.txt|html` + `media/001.jpg…`(服务端经 `/api/media` 代理绕过防盗链) |
+| X      | 纯文本(超 280 自动切 thread)                                                                                     |
+| 小红书 | 标题 + 正文 + 话题;图片按顺序编号                                                                                |
+| B 站   | Markdown/纯文本                                                                                                  |
+| 全部   | `fflate` 在浏览器内打包 ZIP:`{platform}.txt                                                                      | html`+`media/001.jpg…`(服务端经 `/api/media` 代理绕过防盗链) |
 
 ## 8. 部署与运维
 

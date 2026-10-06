@@ -2,12 +2,12 @@
 
 让 Claude Code / Cursor / Codex 直接调用 MediaForge。stdio 传输,4 个工具:
 
-| 工具 | 作用 |
-|------|------|
-| `rewrite_url` | 抓取链接(X / 小红书 / B 站 / 公众号 / 任意文章)并改写成指定平台文案,媒体原样透传 |
-| `compose_post` | 从话题(可附参考链接)写长文 Markdown 或单平台短文 |
-| `learn_style` | 从样本(URL 或正文)学习风格,返回 `style`(含 `prompt`) |
-| `refine_style` | 用反馈或「原稿→改稿」对修正风格,返回下一版 + changelog |
+| 工具           | 作用                                                                             |
+| -------------- | -------------------------------------------------------------------------------- |
+| `rewrite_url`  | 抓取链接(X / 小红书 / B 站 / 公众号 / 任意文章)并改写成指定平台文案,媒体原样透传 |
+| `compose_post` | 从话题(可附参考链接)写长文 Markdown 或单平台短文                                 |
+| `learn_style`  | 从样本(URL 或正文)学习风格,返回 `style`(含 `prompt`)                             |
+| `refine_style` | 用反馈或「原稿→改稿」对修正风格,返回下一版 + changelog                           |
 
 `style` 参数形如 `{ "name": "我的号", "prompt": "…" }`,即 `learn_style` 返回的内容。
 
@@ -101,4 +101,5 @@ curl -s localhost:3000/api/health          # mode 应为 "anthropic"
 curl -s -X POST localhost:3000/api/rewrite -H 'content-type: application/json' \
   -d '{"url":"https://example.com","platforms":["xhs","x"]}'
 ```
+
 页面右下角徽章同步显示 `LLM: Claude Sonnet 4.5`。MCP 端同理:同一环境变量下 `pnpm mcp` 会切到 Claude。

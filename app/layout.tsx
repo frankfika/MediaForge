@@ -15,7 +15,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem("mediaforge.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}` }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("mediaforge.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`,
+          }}
+        />
       </head>
       <body className="min-h-dvh">
         <ThemeInit />

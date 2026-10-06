@@ -2,7 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { assertPublic, fetchLink } from "./fetcher";
 
 describe("assertPublic", () => {
-  it.each(["http://localhost/", "http://127.0.0.1/", "http://10.0.0.1/", "http://192.168.1.1/", "http://172.20.0.1/", "http://169.254.169.254/", "http://[::1]/"])("rejects %s", (u) => {
+  it.each([
+    "http://localhost/",
+    "http://127.0.0.1/",
+    "http://10.0.0.1/",
+    "http://192.168.1.1/",
+    "http://172.20.0.1/",
+    "http://169.254.169.254/",
+    "http://[::1]/",
+  ])("rejects %s", (u) => {
     expect(() => assertPublic(new URL(u))).toThrow();
   });
   it("rejects non-http", () => expect(() => assertPublic(new URL("file:///etc/passwd"))).toThrow());
@@ -57,11 +65,23 @@ describe("fetchLink: validation", () => {
 describe("fetchLink: site adapters", () => {
   it("X → fxtwitter API", async () => {
     const calls = mockFetch(() => ({
-      body: { tweet: { text: "hello world", author: { name: "Ann" }, media: { photos: [{ url: "https://p/1.jpg" }], videos: [{ url: "https://v/1.mp4" }] } } },
+      body: {
+        tweet: {
+          text: "hello world",
+          author: { name: "Ann" },
+          media: { photos: [{ url: "https://p/1.jpg" }], videos: [{ url: "https://v/1.mp4" }] },
+        },
+      },
     }));
     const s = await fetchLink("https://x.com/ann/status/123");
     expect(calls[0]!.url).toBe("https://api.fxtwitter.com/ann/status/123");
-    expect(s).toMatchObject({ title: "hello world", author: "Ann", text: "hello world", images: ["https://p/1.jpg"], videos: ["https://v/1.mp4"] });
+    expect(s).toMatchObject({
+      title: "hello world",
+      author: "Ann",
+      text: "hello world",
+      images: ["https://p/1.jpg"],
+      videos: ["https://v/1.mp4"],
+    });
   });
   it("X: non-tweet URL is rejected", async () => {
     mockFetch(() => ({}));
@@ -84,8 +104,12 @@ describe("fetchLink: site adapters", () => {
   ])("short link %s is resolved recursively", async (short, target) => {
     const calls = mockFetch((url) => {
       if (url === short) return { body: "", finalUrl: target };
-      if (url.startsWith("https://api.bilibili.com")) return { body: { data: { title: "B", desc: "d", pic: "https://pic/b.jpg", owner: { name: "o" } } } };
-      return { body: page("", `<meta property="og:title" content="XHS note"><meta property="og:description" content="${longText}">`), finalUrl: url };
+      if (url.startsWith("https://api.bilibili.com"))
+        return { body: { data: { title: "B", desc: "d", pic: "https://pic/b.jpg", owner: { name: "o" } } } };
+      return {
+        body: page("", `<meta property="og:title" content="XHS note"><meta property="og:description" content="${longText}">`),
+        finalUrl: url,
+      };
     });
     const s = await fetchLink(short);
     expect(calls[0]!.url).toBe(short);
@@ -97,7 +121,9 @@ describe("fetchLink: site adapters", () => {
 describe("fetchLink: html", () => {
   it("WeChat: #js_content selector", async () => {
     mockFetch(() => ({
-      body: page(`<h1 id="activity-name"> 标题 </h1><span id="js_name">公众号X</span><div id="js_content"><p>${longText}</p><img data-src="https://mmbiz/1.png"><img src="/rel.png"></div>`),
+      body: page(
+        `<h1 id="activity-name"> 标题 </h1><span id="js_name">公众号X</span><div id="js_content"><p>${longText}</p><img data-src="https://mmbiz/1.png"><img src="/rel.png"></div>`,
+      ),
     }));
     const s = await fetchLink("https://mp.weixin.qq.com/s/wx1");
     expect(s).toMatchObject({ title: "标题", author: "公众号X", images: ["https://mmbiz/1.png"], videos: [] });
@@ -105,8 +131,10 @@ describe("fetchLink: html", () => {
   });
   it("generic: Readability + og meta", async () => {
     mockFetch(() => ({
-      body: page(`<article><h1>Hello</h1><p>${longText}</p><p>${longText}</p><img src="https://img/in.png"></article>`,
-        `<title>Hello</title><meta property="og:image" content="https://img/og.png"><meta property="og:video" content="https://v/o.mp4"><meta property="og:site_name" content="Site">`),
+      body: page(
+        `<article><h1>Hello</h1><p>${longText}</p><p>${longText}</p><img src="https://img/in.png"></article>`,
+        `<title>Hello</title><meta property="og:image" content="https://img/og.png"><meta property="og:video" content="https://v/o.mp4"><meta property="og:site_name" content="Site">`,
+      ),
     }));
     const s = await fetchLink("https://blog.example.com/post");
     expect(s.text).toContain("足够长的正文");
@@ -153,7 +181,14 @@ describe("fetchLink: firecrawl fallback", () => {
   const thinPage = page("<p>hi</p>", `<meta property="og:title" content="Thin">`);
   const fc = (url: string) =>
     url.includes("firecrawl")
-      ? { body: { data: { markdown: `# Full\n\n${longText}\n\n![a](https://img/fc.png)`, metadata: { title: "FC title", ogImage: "https://img/og.png" } } } }
+      ? {
+          body: {
+            data: {
+              markdown: `# Full\n\n${longText}\n\n![a](https://img/fc.png)`,
+              metadata: { title: "FC title", ogImage: "https://img/og.png" },
+            },
+          },
+        }
       : { body: thinPage };
 
   it("no key: thin local result is returned as-is", async () => {

@@ -8,10 +8,10 @@ labels: bug
 
 **Expected**
 
-**Steps to reproduce**
-1.
+**Steps to reproduce** 1.
 
 **Environment**
+
 - OS / browser:
 - Node / pnpm:
 - LLM mode (mock or real key):

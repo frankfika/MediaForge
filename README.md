@@ -4,7 +4,7 @@
 
 **贴一个链接,或说一个话题。AI 用*你的*文风,写给公众号、X、小红书、B 站。复制,发布。**
 
-Paste a link or a topic. AI writes it in *your* voice for WeChat, X, Xiaohongshu and Bilibili. Copy, publish.
+Paste a link or a topic. AI writes it in _your_ voice for WeChat, X, Xiaohongshu and Bilibili. Copy, publish.
 
 [![typecheck](https://img.shields.io/badge/typecheck-passing-brightgreen)](.github/workflows/ci.yml)
 [![test](https://img.shields.io/badge/test-15%20passed-brightgreen)](.github/workflows/ci.yml)
@@ -14,7 +14,6 @@ Paste a link or a topic. AI writes it in *your* voice for WeChat, X, Xiaohongshu
 <img src="docs/assets/og.png" alt="MediaForge" width="720" />
 
 </div>
-
 
 ## Quick Start
 
@@ -30,12 +29,12 @@ pnpm dev                          # 3. http://localhost:3000
 
 ## Features
 
-| | 特性 |
-|---|---|
-| **对话优先** | 抓取、改写、学风格都是 agent 的 *tool*,UI 只渲染工具结果。<br/><img src="docs/assets/chat-drawer.png" alt="chat" width="480" /> |
-| **改写模式** | 链接(X / 小红书 / B 站 / 公众号 / 任意文章)→ 抓取 → 选平台 → 一键复制,图片视频原样保留。<br/><img src="docs/assets/rewrite.png" alt="rewrite" width="480" /> |
-| **创作模式** | 话题 + 参考链接 → 流式长文 → 适配多平台。<br/><img src="docs/assets/demo-output.png" alt="editor" width="480" /> |
-| **风格 Agent** | 3–5 篇样本 → 语音特征 → 风格 Prompt;可用反馈或*你的手改*迭代,支持版本回滚与云同步。<br/><img src="docs/assets/styles.png" alt="styles" width="480" /> |
+|                | 特性                                                                                                                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **对话优先**   | 抓取、改写、学风格都是 agent 的 _tool_,UI 只渲染工具结果。<br/><img src="docs/assets/chat-drawer.png" alt="chat" width="480" />                                                                      |
+| **改写模式**   | 链接(X / 小红书 / B 站 / 公众号 / 任意文章)→ 抓取 → 选平台 → 一键复制,图片视频原样保留。<br/><img src="docs/assets/rewrite.png" alt="rewrite" width="480" />                                         |
+| **创作模式**   | 话题 + 参考链接 → 流式长文 → 适配多平台。<br/><img src="docs/assets/demo-output.png" alt="editor" width="480" />                                                                                     |
+| **风格 Agent** | 3–5 篇样本 → 语音特征 → 风格 Prompt;可用反馈或*你的手改*迭代,支持版本回滚与云同步。<br/><img src="docs/assets/styles.png" alt="styles" width="480" />                                                |
 | **导出与 MCP** | 公众号内联 HTML、ZIP 打包;MediaForge 本身也是 MCP server,可被 Claude Code / Cursor / Codex 调用([docs/mcp.md](docs/mcp.md))。<br/><img src="docs/assets/demo-output.png" alt="export" width="480" /> |
 
 无 `ANTHROPIC_API_KEY` 时所有路由返回确定性 mock(响应里 `"llm": "mock"`,右下角有徽章),方便试用与测试。
@@ -63,25 +62,25 @@ pnpm dev                          # 3. http://localhost:3000
 
 ## Tech Stack
 
-| 层 | 选型 |
-|---|---|
-| 框架 | Next.js 15 App Router · React 19 · TypeScript (strict) |
-| UI | Tailwind v4 (OKLCH tokens) · shadcn 约定(`cva` + `cn`) · Motion · lucide |
-| AI | Vercel AI SDK v5(`useChat` / `streamText` / tool-use)· Claude Sonnet 4.5 默认;不引入 LangGraph |
-| 抓取 | `@mozilla/readability` + `linkedom`;X 走 fxtwitter;B 站走 view API;Firecrawl 兜底 |
-| 数据 | Neon Postgres + Drizzle(可选;默认 localStorage) |
-| 集成 | `@modelcontextprotocol/sdk`(stdio MCP server)· `jszip` |
-| 测试 / CI | Vitest · GitHub Actions |
+| 层        | 选型                                                                                           |
+| --------- | ---------------------------------------------------------------------------------------------- |
+| 框架      | Next.js 15 App Router · React 19 · TypeScript (strict)                                         |
+| UI        | Tailwind v4 (OKLCH tokens) · shadcn 约定(`cva` + `cn`) · Motion · lucide                       |
+| AI        | Vercel AI SDK v5(`useChat` / `streamText` / tool-use)· Claude Sonnet 4.5 默认;不引入 LangGraph |
+| 抓取      | `@mozilla/readability` + `linkedom`;X 走 fxtwitter;B 站走 view API;Firecrawl 兜底              |
+| 数据      | Neon Postgres + Drizzle(可选;默认 localStorage)                                                |
+| 集成      | `@modelcontextprotocol/sdk`(stdio MCP server)· `jszip`                                         |
+| 测试 / CI | Vitest · GitHub Actions                                                                        |
 
 ## Configuration
 
-| 变量 | 必需 | 说明 |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | 否(缺省 mock) | 真实 LLM |
-| `ANTHROPIC_MODEL` | 否 | 默认 `claude-sonnet-4-5` |
-| `FIRECRAWL_API_KEY` | 否 | 登录墙页面兜底抓取 |
-| `DATABASE_URL` | 否 | Neon Postgres,启用风格云同步 |
-| `JINA_API_KEY` | 否 | **预留**,当前代码尚未读取 |
+| 变量                | 必需          | 说明                         |
+| ------------------- | ------------- | ---------------------------- |
+| `ANTHROPIC_API_KEY` | 否(缺省 mock) | 真实 LLM                     |
+| `ANTHROPIC_MODEL`   | 否            | 默认 `claude-sonnet-4-5`     |
+| `FIRECRAWL_API_KEY` | 否            | 登录墙页面兜底抓取           |
+| `DATABASE_URL`      | 否            | Neon Postgres,启用风格云同步 |
+| `JINA_API_KEY`      | 否            | **预留**,当前代码尚未读取    |
 
 ## Deployment
 
@@ -108,6 +107,7 @@ docker compose --profile db up -d --build    # 附带 Postgres(DATABASE_URL=post
 **v0.1.0** — 5 页面 · 13 个 API · MCP server · mock LLM · 演示数据 · 15 个单测。
 
 Roadmap:
+
 - [ ] 真实 key 下的端到端验证与 prompt 调优
 - [ ] 登录态抓取成功率(只能尽力而为)
 - [ ] Jina Reader 抓取后端

@@ -5,13 +5,20 @@ import { chromium } from "@playwright/test";
 
 const BASE = "http://localhost:3000";
 const OUT = "docs/assets";
-const up = () => fetch(`${BASE}/api/health`).then((r) => r.ok, () => false);
+const up = () =>
+  fetch(`${BASE}/api/health`).then(
+    (r) => r.ok,
+    () => false,
+  );
 
 let server;
 if (!(await up())) {
   server = spawn("pnpm", ["dev"], { stdio: "ignore", detached: true });
   for (let i = 0; i < 120 && !(await up()); i++) await new Promise((r) => setTimeout(r, 1000));
-  if (!(await up())) { process.kill(-server.pid); throw new Error("dev server did not start"); }
+  if (!(await up())) {
+    process.kill(-server.pid);
+    throw new Error("dev server did not start");
+  }
 }
 
 const browser = await chromium.launch();

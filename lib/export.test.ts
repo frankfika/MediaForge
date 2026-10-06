@@ -3,7 +3,11 @@ import { buildExport, wechatHtml } from "./export";
 import type { PlatformPost } from "./types";
 
 describe("wechatHtml", () => {
-  const html = wechatHtml({ platform: "wechat", title: "T", body: "## 第一节\n\n> 引用一句\n\n- 要点A\n- 要点B\n\n## 第二节\n\n正文 **重点**" });
+  const html = wechatHtml({
+    platform: "wechat",
+    title: "T",
+    body: "## 第一节\n\n> 引用一句\n\n- 要点A\n- 要点B\n\n## 第二节\n\n正文 **重点**",
+  });
 
   it("numbers headings with badges", () => {
     expect(html).toContain(">01<");

@@ -27,7 +27,15 @@ function fakeDb(results: unknown[]) {
 
 const d = (s: string) => new Date(s);
 const S = { id: "s1", userId: "u", name: "N", currentVersion: 2, createdAt: d("2024-01-01") };
-const V = (version: number) => ({ id: `v${version}`, styleId: "s1", version, prompt: `p${version}`, features: { f: version }, changelog: null, createdAt: d("2024-01-0" + version) });
+const V = (version: number) => ({
+  id: `v${version}`,
+  styleId: "s1",
+  version,
+  prompt: `p${version}`,
+  features: { f: version },
+  changelog: null,
+  createdAt: d("2024-01-0" + version),
+});
 const U = "00000000-0000-4000-8000-000000000009";
 
 beforeEach(() => getDb.mockReset());
@@ -35,7 +43,15 @@ beforeEach(() => getDb.mockReset());
 describe("listStyles", () => {
   it("empty", async () => expect(await listStyles(fakeDb([[]]).db, "u")).toEqual([]));
   it("maps joined rows in order", async () => {
-    const out = await listStyles(fakeDb([[{ styles: S, style_versions: V(2) }, { styles: { ...S, id: "s2" }, style_versions: V(1) }]]).db, "u");
+    const out = await listStyles(
+      fakeDb([
+        [
+          { styles: S, style_versions: V(2) },
+          { styles: { ...S, id: "s2" }, style_versions: V(1) },
+        ],
+      ]).db,
+      "u",
+    );
     expect(out.map((s) => s.id)).toEqual(["s1", "s2"]);
     expect(out[0]).toMatchObject({ prompt: "p2", currentVersion: 2, createdAt: "2024-01-01T00:00:00.000Z" });
     expect(out[0]).not.toHaveProperty("versions");
@@ -81,7 +97,8 @@ describe("addVersion", () => {
     expect(out?.currentVersion).toBe(6);
     expect(calls).toContain("update");
   });
-  it("null when style not owned", async () => expect(await addVersion(fakeDb([[]]).db, "u", "s1", { prompt: "x", changelog: [] })).toBeNull());
+  it("null when style not owned", async () =>
+    expect(await addVersion(fakeDb([[]]).db, "u", "s1", { prompt: "x", changelog: [] })).toBeNull());
   it("handles empty history (top undefined)", async () => {
     const { db } = fakeDb([[S], [{}], [], undefined, undefined, [S], [V(2)]]);
     expect(await addVersion(db, "u", "s1", { prompt: "x", changelog: [] })).not.toBeNull();
@@ -131,10 +148,14 @@ describe("styleRoute", () => {
   });
   it("503 DB_UNAVAILABLE on throw; thrown Response passes through", async () => {
     getDb.mockReturnValue({});
-    const r = await styleRoute(null, async () => { throw new Error("boom"); })(post({}), ctx);
+    const r = await styleRoute(null, async () => {
+      throw new Error("boom");
+    })(post({}), ctx);
     expect(r.status).toBe(503);
     expect((await r.json()).code).toBe("DB_UNAVAILABLE");
-    const r2 = await styleRoute(null, async () => { throw new Response("t", { status: 418 }); })(post({}), ctx);
+    const r2 = await styleRoute(null, async () => {
+      throw new Response("t", { status: 418 });
+    })(post({}), ctx);
     expect(r2.status).toBe(418);
   });
 });

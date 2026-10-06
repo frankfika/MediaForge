@@ -43,12 +43,21 @@ export function wechatHtml(post: PlatformPost, images: string[] = []): string {
     list = [];
   };
   for (const raw of post.body.split(/\n{2,}|\n(?=#{1,3} |> |- |\* |\d+\. )/)) {
-    for (const line of raw.split("\n").map((l) => l.trim()).filter(Boolean)) {
+    for (const line of raw
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)) {
       const li = line.match(/^(?:[-*]|\d+\.)\s+(.*)/);
-      if (li?.[1]) { list.push(li[1]); continue; }
+      if (li?.[1]) {
+        list.push(li[1]);
+        continue;
+      }
       flush();
       const h = line.match(/^#{1,3}\s+(.*)/);
-      if (h?.[1]) out.push(`<section style="${S.h}"><span style="${S.num}">${String(++n).padStart(2, "0")}</span><span>${inline(h[1])}</span></section>`);
+      if (h?.[1])
+        out.push(
+          `<section style="${S.h}"><span style="${S.num}">${String(++n).padStart(2, "0")}</span><span>${inline(h[1])}</span></section>`,
+        );
       else if (line.startsWith(">")) out.push(`<blockquote style="${S.quote}">${inline(line.replace(/^>\s*/, ""))}</blockquote>`);
       else if (/^-{3,}$/.test(line)) out.push(`<hr style="${S.hr}"/>`);
       else out.push(`<p style="${S.p}">${inline(line)}</p>`);
@@ -62,7 +71,9 @@ export function wechatHtml(post: PlatformPost, images: string[] = []): string {
 
 const plain = (p?: PlatformPost) => (p ? (p.title ? `${p.title}\n\n${p.body}` : p.body) : "");
 const md = (p: PlatformPost | undefined, images: string[]) =>
-  p ? `${p.title ? `# ${p.title}\n\n` : ""}${p.body}${images.length ? `\n\n${images.map((s, i) => `![图${i + 1}](${s})`).join("\n")}` : ""}\n` : "";
+  p
+    ? `${p.title ? `# ${p.title}\n\n` : ""}${p.body}${images.length ? `\n\n${images.map((s, i) => `![图${i + 1}](${s})`).join("\n")}` : ""}\n`
+    : "";
 
 export type ExportBundle = {
   wechat_html: string;
@@ -87,6 +98,8 @@ export function buildExport({ posts, media }: RewriteResult): ExportBundle {
     ["xhs.md", b.xhs_md],
     ["bilibili.md", b.bilibili_md],
     ["media.txt", [...media.images, ...media.videos].join("\n")],
-  ].filter(([, c]) => c).map(([name, content]) => ({ name: name!, content: content! }));
+  ]
+    .filter(([, c]) => c)
+    .map(([name, content]) => ({ name: name!, content: content! }));
   return { ...b, files };
 }

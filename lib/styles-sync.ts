@@ -25,7 +25,8 @@ const set = (patch: Partial<Sync>) => {
 const subscribe = (l: () => void) => (listeners.add(l), () => void listeners.delete(l));
 
 class DbError extends Error {}
-const userId = () => localStorage.getItem(USER_KEY) ?? (localStorage.setItem(USER_KEY, crypto.randomUUID()), localStorage.getItem(USER_KEY)!);
+const userId = () =>
+  localStorage.getItem(USER_KEY) ?? (localStorage.setItem(USER_KEY, crypto.randomUUID()), localStorage.getItem(USER_KEY)!);
 
 async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   let res: Response;
@@ -125,7 +126,11 @@ export async function rollback(id: string, version: number) {
 }
 
 export function useStylesDb() {
-  const s = useSyncExternalStore(subscribe, () => state, () => SERVER);
+  const s = useSyncExternalStore(
+    subscribe,
+    () => state,
+    () => SERVER,
+  );
   const { styles } = useLocalStyles();
   const pending = s.mode === "db" && s.remoteIds ? styles.filter((x) => !s.remoteIds!.includes(x.id)) : [];
   return {

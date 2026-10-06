@@ -9,7 +9,8 @@ test("demo flow: load demo styles → 试一下 → switch tabs → mock copy �
   await page.getByRole("button", { name: /试一下/ }).click();
   await expect(page.getByText("Example Domain").first()).toBeVisible({ timeout: 30_000 });
 
-  for (const label of ["公众号", "X / 推特", "小红书", "B 站"]) await expect(page.getByRole("button", { name: label, exact: true })).toBeVisible();
+  for (const label of ["公众号", "X / 推特", "小红书", "B 站"])
+    await expect(page.getByRole("button", { name: label, exact: true })).toBeVisible();
 
   // mock output markers: xhs title starts with ✨, bilibili title wrapped in 【】, wechat closes with a reply prompt
   await page.getByRole("button", { name: "小红书", exact: true }).click();

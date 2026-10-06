@@ -10,7 +10,10 @@ export type StyleDiff = {
 type ListDiff = { added: string[]; removed: string[] };
 
 const nl = (s: string) => (s && !s.endsWith("\n") ? `${s}\n` : s); // diffLines would flag a missing trailing newline as a change
-const list = (a: string[] = [], b: string[] = []): ListDiff => ({ added: b.filter((x) => !a.includes(x)), removed: a.filter((x) => !b.includes(x)) });
+const list = (a: string[] = [], b: string[] = []): ListDiff => ({
+  added: b.filter((x) => !a.includes(x)),
+  removed: a.filter((x) => !b.includes(x)),
+});
 
 /** Line-level prompt diff (added/removed are line counts) plus set-diffs of the feature lists. */
 export function diffStyleVersions(from: StyleVersion, to: StyleVersion): StyleDiff {

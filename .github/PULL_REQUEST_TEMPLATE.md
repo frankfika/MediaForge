@@ -1,6 +1,7 @@
 ## What & why
 
 ## Checklist
+
 - [ ] `pnpm typecheck`
 - [ ] `pnpm test`
 - [ ] `pnpm build`

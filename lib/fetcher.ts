@@ -8,8 +8,7 @@ import { Readability } from "@mozilla/readability";
 import { parseHTML } from "linkedom";
 import type { Source } from "./types";
 
-const UA =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36";
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36";
 
 // ponytail: per-process memo, 5 min. Swap for Vercel KV if cold starts make it useless.
 const cache = new Map<string, { at: number; value: Source }>();
@@ -127,7 +126,9 @@ async function firecrawl(u: URL): Promise<Source | null> {
     const text = data?.markdown?.trim();
     if (!text) return null;
     const m = data?.metadata ?? {};
-    const images = [...new Set([m.ogImage, ...[...text.matchAll(/!\[[^\]]*\]\((https?:[^)\s]+)\)/g)].map((x) => x[1])])].filter((s): s is string => !!s);
+    const images = [...new Set([m.ogImage, ...[...text.matchAll(/!\[[^\]]*\]\((https?:[^)\s]+)\)/g)].map((x) => x[1])])].filter(
+      (s): s is string => !!s,
+    );
     return { url: u.href, title: m.title || m.ogTitle || "", author: m.author ?? "", text, images, videos: [] };
   } catch {
     return null;
@@ -146,7 +147,8 @@ export async function fetchLink(raw: string, cookies?: Cookies): Promise<Source>
   const host = u.hostname.replace(/^www\./, "");
 
   let value: Source;
-  if (/^(b23\.tv|xhslink\.com)$/.test(host)) value = await fetchLink((await get(u.href, cookies)).url, cookies); // resolve short link
+  if (/^(b23\.tv|xhslink\.com)$/.test(host))
+    value = await fetchLink((await get(u.href, cookies)).url, cookies); // resolve short link
   else if (/^(x|twitter)\.com$/.test(host)) value = await twitter(u, cookies);
   else if (/(^|\.)bilibili\.com$/.test(host)) value = await bilibili(u, cookies);
   else {

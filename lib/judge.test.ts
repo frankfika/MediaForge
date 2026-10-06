@@ -10,7 +10,8 @@ const refs = [
   "取舍决定成本。结论很简单。实现可以很短。边界先说明。这是取舍。",
 ];
 const near = "结论先说。本质是取舍。实现成本不高。边界要说清楚。这是结论。";
-const far = "Yesterday afternoon I wandered through the old harbour market, where fishermen argued loudly about prices while gulls circled overhead waiting for scraps, and I bought a paper bag of warm chestnuts that I ate slowly on the stone pier as the sun dropped behind the lighthouse, which is where the story really begins!";
+const far =
+  "Yesterday afternoon I wandered through the old harbour market, where fishermen argued loudly about prices while gulls circled overhead waiting for scraps, and I bought a paper bag of warm chestnuts that I ate slowly on the stone pier as the sun dropped behind the lighthouse, which is where the story really begins!";
 
 describe("style judge", () => {
   it("scores a near-identical style above 80", () => {
@@ -46,7 +47,7 @@ describe("style judge", () => {
     const r = judgeStyle({ style, sampleText: DEMO_TEXTS[1]!.text, referenceTexts: refs });
     const sum = (Object.keys(WEIGHTS) as (keyof typeof WEIGHTS)[]).reduce((s, k) => s + WEIGHTS[k] * r.signals[k], 0);
     expect(r.score).toBe(Math.round(sum * 100));
-    for (const v of Object.values(r.signals)) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(1);
+    for (const v of Object.values(r.signals)) (expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(1));
   });
   it("feedback names the weakest signal", () => {
     const r = judgeStyle({ style, sampleText: near + "太棒了!营销话术", referenceTexts: refs });

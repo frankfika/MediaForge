@@ -10,7 +10,11 @@ import type { Platform, RewriteResult, Source, StyleProfile, StyleRef } from "./
 
 export const llmMode = (): "anthropic" | "mock" => (process.env.ANTHROPIC_API_KEY ? "anthropic" : "mock");
 
-const sentences = (t: string) => t.split(/(?<=[。！？!?.])\s*|\n+/).map((s) => s.trim()).filter(Boolean);
+const sentences = (t: string) =>
+  t
+    .split(/(?<=[。！？!?.])\s*|\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 const HASHTAG_SOURCES = /[\p{Script=Han}]{2,4}|[A-Za-z]{4,}/gu;
 
@@ -27,11 +31,22 @@ function take(text: string, limit: number) {
 function topWords(text: string, n: number) {
   const freq = new Map<string, number>();
   for (const w of text.match(HASHTAG_SOURCES) ?? []) freq.set(w, (freq.get(w) ?? 0) + 1);
-  return [...freq].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, n).map(([w]) => w);
+  return [...freq]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, n)
+    .map(([w]) => w);
 }
 
 export const mock = {
-  async rewrite({ source, platforms, instruction }: { source: Source; platforms: Platform[]; instruction?: string }): Promise<RewriteResult> {
+  async rewrite({
+    source,
+    platforms,
+    instruction,
+  }: {
+    source: Source;
+    platforms: Platform[];
+    instruction?: string;
+  }): Promise<RewriteResult> {
     const tags = topWords(source.text, 4);
     const posts = platforms.map((platform) => {
       const { limit } = PLATFORM_SPECS[platform];
@@ -40,7 +55,11 @@ export const mock = {
         case "x":
           return { platform, body: take(source.text, limit - 40) + (tags[0] ? ` #${tags[0]}` : "") };
         case "xhs":
-          return { platform, title: `✨${clip(source.title, 18)}`, body: `${take(source.text, limit - 80)}${note}\n\n${tags.map((t) => `#${t}`).join(" ")}` };
+          return {
+            platform,
+            title: `✨${clip(source.title, 18)}`,
+            body: `${take(source.text, limit - 80)}${note}\n\n${tags.map((t) => `#${t}`).join(" ")}`,
+          };
         case "wechat":
           return { platform, title: clip(source.title, 22), body: `${take(source.text, limit)}${note}\n\n你怎么看?欢迎在评论区聊聊。` };
         case "bilibili":
@@ -55,8 +74,13 @@ export const mock = {
     const ss = sentences(all);
     const avg = Math.round(all.replace(/\s/g, "").length / Math.max(ss.length, 1));
     const vocabulary = topWords(all, 12);
-    const devices = [/[?？]/.test(all) && "rhetorical questions", /^\s*[-*\d]+[.)、]?\s/m.test(all) && "lists", /["“「]/.test(all) && "quotations"].filter((d): d is string => !!d);
-    const rhythm = avg < 20 ? "short, punchy sentences" : avg < 40 ? "medium sentences with occasional short ones" : "long, flowing sentences";
+    const devices = [
+      /[?？]/.test(all) && "rhetorical questions",
+      /^\s*[-*\d]+[.)、]?\s/m.test(all) && "lists",
+      /["“「]/.test(all) && "quotations",
+    ].filter((d): d is string => !!d);
+    const rhythm =
+      avg < 20 ? "short, punchy sentences" : avg < 40 ? "medium sentences with occasional short ones" : "long, flowing sentences";
     const exemplars = ss.filter((s) => s.length > 6).slice(0, 2);
     return {
       features: { avgSentenceLength: avg, vocabulary, rhythm, devices, taboos: [] },
@@ -65,7 +89,9 @@ export const mock = {
         vocabulary.length ? `Favor these signature words when natural: ${vocabulary.join(", ")}.` : "",
         devices.length ? `Habitual devices: ${devices.join(", ")}.` : "",
         exemplars.length ? `Exemplar lines:\n${exemplars.map((e) => `- ${clip(e, 80)}`).join("\n")}` : "",
-      ].filter(Boolean).join("\n"),
+      ]
+        .filter(Boolean)
+        .join("\n"),
     };
   },
 
@@ -75,14 +101,18 @@ export const mock = {
     if (feedback) rules.push(`User feedback: ${feedback}`);
     if (original && edited) {
       const diff = sentences(edited).length - sentences(original).length;
-      rules.push(`Edits tend to ${diff < 0 ? "merge and shorten sentences" : diff > 0 ? "split into more sentences" : "keep sentence count but reword"}.`);
+      rules.push(
+        `Edits tend to ${diff < 0 ? "merge and shorten sentences" : diff > 0 ? "split into more sentences" : "keep sentence count but reword"}.`,
+      );
     }
     return { prompt: `${style.prompt}\n${rules.map((r) => `- ${r}`).join("\n")}`, changelog: rules.map((r) => `+ ${clip(r, 80)}`) };
   },
 
   async compose({ topic, platform, references = [] }: A<"compose">) {
     const points = references.flatMap((r) => sentences(r.text).slice(0, 2));
-    const body = (points.length ? points : [`围绕「${topic}」,先讲背景,再讲关键判断,最后给出可执行的建议。`]).map((p) => `- ${p}`).join("\n");
+    const body = (points.length ? points : [`围绕「${topic}」,先讲背景,再讲关键判断,最后给出可执行的建议。`])
+      .map((p) => `- ${p}`)
+      .join("\n");
     if (platform === "x") return clip(`${topic}:${points[0] ?? "一个值得展开的话题"}`, 280);
     return `# ${topic}\n\n## 为什么现在谈这个\n\n${body}\n\n## 关键判断\n\n(待补充:你的观点)\n\n## 接下来怎么做\n\n(待补充:行动建议)`;
   },

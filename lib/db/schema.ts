@@ -12,7 +12,9 @@ export const users = pgTable("users", {
 
 export const styles = pgTable("styles", {
   id: uuid().primaryKey().defaultRandom(),
-  userId: uuid().notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: uuid()
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   name: text().notNull(),
   currentVersion: integer().notNull().default(1),
   createdAt: timestamp().notNull().defaultNow(),
@@ -23,7 +25,9 @@ export const styleVersions = pgTable(
   "style_versions",
   {
     id: uuid().primaryKey().defaultRandom(),
-    styleId: uuid().notNull().references(() => styles.id, { onDelete: "cascade" }),
+    styleId: uuid()
+      .notNull()
+      .references(() => styles.id, { onDelete: "cascade" }),
     version: integer().notNull(),
     prompt: text().notNull(),
     features: jsonb(),
@@ -35,14 +39,18 @@ export const styleVersions = pgTable(
 
 export const styleSamples = pgTable("style_samples", {
   id: uuid().primaryKey().defaultRandom(),
-  styleId: uuid().notNull().references(() => styles.id, { onDelete: "cascade" }),
+  styleId: uuid()
+    .notNull()
+    .references(() => styles.id, { onDelete: "cascade" }),
   sourceUrl: text(),
   text: text().notNull(),
 });
 
 export const articles = pgTable("articles", {
   id: uuid().primaryKey().defaultRandom(),
-  userId: uuid().notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: uuid()
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   styleId: uuid().references(() => styles.id, { onDelete: "set null" }),
   mode: text({ enum: ["rewrite", "compose"] }).notNull(),
   sourceUrl: text(),
@@ -53,7 +61,9 @@ export const articles = pgTable("articles", {
 
 export const outputs = pgTable("outputs", {
   id: uuid().primaryKey().defaultRandom(),
-  articleId: uuid().notNull().references(() => articles.id, { onDelete: "cascade" }),
+  articleId: uuid()
+    .notNull()
+    .references(() => articles.id, { onDelete: "cascade" }),
   platform: platformEnum().notNull(),
   title: text(),
   body: text().notNull(),

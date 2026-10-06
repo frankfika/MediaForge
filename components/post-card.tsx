@@ -24,7 +24,11 @@ export function SourceCard({ source }: { source: Source }) {
       </p>
       <p className="mt-2 line-clamp-3 text-muted">{source.text}</p>
       {source.images.length > 0 && (
-        <div className="mt-3 flex gap-2 overflow-x-auto">{source.images.slice(0, 6).map((s) => <Img key={s} src={s} />)}</div>
+        <div className="mt-3 flex gap-2 overflow-x-auto">
+          {source.images.slice(0, 6).map((s) => (
+            <Img key={s} src={s} />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -85,7 +89,8 @@ export function PostTabs({ result }: { result: RewriteResult }) {
       result.media.images.map(async (src, n) => {
         try {
           const r = await fetch(src);
-          if (r.ok) zip.file(`images/${n + 1}.${(r.headers.get("content-type") ?? "").split("/")[1]?.split(";")[0] || "jpg"}`, await r.blob());
+          if (r.ok)
+            zip.file(`images/${n + 1}.${(r.headers.get("content-type") ?? "").split("/")[1]?.split(";")[0] || "jpg"}`, await r.blob());
         } catch {}
       }),
     );
@@ -137,7 +142,9 @@ export function PostTabs({ result }: { result: RewriteResult }) {
         </p>
         {(result.media.images.length > 0 || result.media.videos.length > 0) && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {result.media.images.map((s) => <Img key={s} src={s} />)}
+            {result.media.images.map((s) => (
+              <Img key={s} src={s} />
+            ))}
             {result.media.videos.map((v) => (
               <a key={v} href={v} target="_blank" rel="noreferrer" className="text-xs text-accent underline">
                 视频 ↗

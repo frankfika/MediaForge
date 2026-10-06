@@ -28,7 +28,9 @@ describe("xhs cookie", () => {
   it("degrades to undefined on corrupt base64 or storage errors", () => {
     localStorage.setItem(KEY, "%%%not-base64%%%");
     expect(getXhsCookie()).toBeUndefined();
-    const spy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => { throw new Error("denied"); });
+    const spy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("denied");
+    });
     expect(getXhsCookie()).toBeUndefined();
     spy.mockRestore();
   });

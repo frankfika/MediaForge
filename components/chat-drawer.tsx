@@ -54,7 +54,9 @@ export function ChatDrawer() {
         className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-line bg-bg shadow-xl"
       >
         <div className="flex h-12 shrink-0 items-center justify-between border-b border-line px-4">
-          <span className="text-sm font-medium">MediaForge 助手 <kbd className="ml-2 rounded border border-line px-1 text-[10px] text-muted">⌘K</kbd></span>
+          <span className="text-sm font-medium">
+            MediaForge 助手 <kbd className="ml-2 rounded border border-line px-1 text-[10px] text-muted">⌘K</kbd>
+          </span>
           <Button variant="ghost" size="icon" aria-label="关闭" onClick={() => setOpen(false)}>
             <X className="size-4" />
           </Button>
