@@ -46,7 +46,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 33. `1356727` R34 — i18n gains a third locale (ja, ~170 keys, typed key parity), Playwright reporter adds 'github' in CI for PR annotations, e2e artifact uses 'if: always()' to always upload the report, new docs/release-notes.md (中文 user-story release post), README links it.
 34. `4326318` R35-R37 — i18n adds fourth locale (ko, 157 keys, parity-tested); /api/styles/[id]/duplicate (cloud path, returns new uuid with 'name (copy)'); bug fix in toVersion() — features from drizzle jsonb is null | undefined, normalise to undefined before cast (otherwise ApiStyle.features: required rejects null).
 35. `f89eb32` R38 — /api/styles/[id]/rename (styleRoute cloud path, drizzle update of styles.name, currentVersion/history untouched, zod name 1-60); GET /api/embed/[query] retrieval (?corpus= comma-separated or 5 default MediaForge docs, ?topK= default 5/max 50, reuses generateEmbeddingsAuto + cosineSim; parseEmbedQs in lib/embed.ts since Next route files allow no extra exports). 251→274 vitest (+23), 25→28 e2e (+3), lines 99.82%.
-36. `ec2dc39` R39 (tag) — e2e/demo-flow + e2e/try-demo no longer hit example.com; Playwright context.route() serves a fixed HTML so these flake-prone cases pass offline in <2 s regardless of host reachability.
+36. `ec2dc39` R39 — e2e/demo-flow + e2e/try-demo no longer hit example.com; Playwright context.route() serves a fixed HTML so these flake-prone cases pass offline in <2 s regardless of host reachability.
+37. `f5b4741` R40 (tag) — home page is now a real dashboard: 18 dashboard.* i18n keys x 4 locales; components/dashboard.tsx (metric strip polled from /api/metrics every 30 s + 6 quick-action cards with lucide icons + footer pill + embedded <Chat /> so 'try-demo' e2e paths still pass); 3 new e2e (home renders, language round-trip, /api/metrics shape).
 
 ## Known limits
 
