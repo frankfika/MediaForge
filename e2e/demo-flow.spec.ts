@@ -1,5 +1,23 @@
 import { expect, test } from "@playwright/test";
 
+const SAMPLE_HTML = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta property="og:title" content="Example Domain">
+    <meta property="og:site_name" content="example.com">
+  </head>
+  <body>
+    <h1>Example Domain</h1>
+    <p>This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission.</p>
+  </body>
+</html>`;
+
+test.beforeEach(async ({ context }) => {
+  await context.route("https://example.com/**", async (route) => {
+    await route.fulfill({ status: 200, contentType: "text/html", body: SAMPLE_HTML });
+  });
+});
+
 test("demo flow: load demo styles → 试一下 → switch tabs → mock copy → clipboard", async ({ page }) => {
   await page.goto("/styles");
   await page.getByRole("button", { name: "加载演示风格" }).click();
