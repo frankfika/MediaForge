@@ -177,6 +177,26 @@ export const zh = {
   "styles.samplesPlaceholder": "贴 3–5 篇样本:文章链接或正文。\n多篇之间用单独一行 --- 分隔。",
   "styles.learn": "学习这个风格",
   "styles.empty": "还没有风格。贴几篇你喜欢的文章,让 AI 学一学。",
+
+  // dashboard
+  "dashboard.metrics.composes": "创作次数",
+  "dashboard.metrics.exports": "导出次数",
+  "dashboard.metrics.learns": "学习风格",
+  "dashboard.metrics.rewrites": "改写次数",
+  "dashboard.quickCompose.desc": "话题 + 参考链接 -> 长文",
+  "dashboard.quickCompose.title": "创作初稿",
+  "dashboard.quickRewrite.desc": "粘贴任意链接 -> 4 平台稿",
+  "dashboard.quickRewrite.title": "重写链接",
+  "dashboard.quickSearch.desc": "用 cosine 找最相关",
+  "dashboard.quickSearch.title": "语义搜索",
+  "dashboard.quickSettings.desc": "主题 / 语言 / cookie",
+  "dashboard.quickSettings.title": "设置",
+  "dashboard.quickShowcase.desc": "看每个独立组件",
+  "dashboard.quickShowcase.title": "组件预览",
+  "dashboard.quickStyles.desc": "学习 / 修正 / 版本化",
+  "dashboard.quickStyles.title": "风格库",
+  "dashboard.subtitle": "粘贴一个链接,或说一个话题。用你自己的文风,改写给公众号 / X / 小红书 / B 站。",
+  "dashboard.title": "MediaForge",
 } as const;
 
 export type Key = keyof typeof zh;
@@ -356,6 +376,26 @@ export const en: Record<Key, string> = {
   "styles.samplesPlaceholder": "Paste 3–5 samples: article links or text.\nSeparate samples with a line containing only ---.",
   "styles.learn": "Learn this style",
   "styles.empty": "No styles yet. Paste a few articles you like and let the AI learn.",
+
+  // dashboard
+  "dashboard.metrics.composes": "Composes",
+  "dashboard.metrics.exports": "Exports",
+  "dashboard.metrics.learns": "Styles learned",
+  "dashboard.metrics.rewrites": "Rewrites",
+  "dashboard.quickCompose.desc": "Topic + reference links -> long form",
+  "dashboard.quickCompose.title": "Compose",
+  "dashboard.quickRewrite.desc": "Paste a URL -> 4 platform drafts",
+  "dashboard.quickRewrite.title": "Rewrite a link",
+  "dashboard.quickSearch.desc": "Find by cosine closeness",
+  "dashboard.quickSearch.title": "Semantic search",
+  "dashboard.quickSettings.desc": "Theme / language / cookie",
+  "dashboard.quickSettings.title": "Settings",
+  "dashboard.quickShowcase.desc": "Inspect every component",
+  "dashboard.quickShowcase.title": "Components",
+  "dashboard.quickStyles.desc": "Learn / refine / version",
+  "dashboard.quickStyles.title": "Style library",
+  "dashboard.subtitle": "Paste a link or name a topic. AI writes in your voice for WeChat / X / Xiaohongshu / Bilibili.",
+  "dashboard.title": "MediaForge",
 };
 
 export const ja: Record<Key, string> = {
@@ -534,6 +574,26 @@ export const ja: Record<Key, string> = {
     "サンプルを 3〜5 篇貼り付けてください:記事のリンクまたは本文。\n複数の場合は、--- だけの行で区切ってください。",
   "styles.learn": "このスタイルを学習",
   "styles.empty": "スタイルはまだありません。好きな記事を数篇貼り付けて、AI に学習させましょう。",
+
+  // dashboard
+  "dashboard.metrics.composes": "作成",
+  "dashboard.metrics.exports": "エクスポート",
+  "dashboard.metrics.learns": "学習スタイル",
+  "dashboard.metrics.rewrites": "書き換え",
+  "dashboard.quickCompose.desc": "話題 + 参考リンク -> 長文",
+  "dashboard.quickCompose.title": "記事作成",
+  "dashboard.quickRewrite.desc": "URL を貼る -> 4 プラットフォーム向け",
+  "dashboard.quickRewrite.title": "リンクを書き換え",
+  "dashboard.quickSearch.desc": "コサイン類似度で探す",
+  "dashboard.quickSearch.title": "セマンティック検索",
+  "dashboard.quickSettings.desc": "テーマ / 言語 / cookie",
+  "dashboard.quickSettings.title": "設定",
+  "dashboard.quickShowcase.desc": "各コンポーネントを確認",
+  "dashboard.quickShowcase.title": "コンポーネント",
+  "dashboard.quickStyles.desc": "学習 / 修正 / バージョン管理",
+  "dashboard.quickStyles.title": "スタイル",
+  "dashboard.subtitle": "リンクを貼るか、話題を入力。あなたの声で WeChat / X / 小紅書 / Bilibili に書き分けます。",
+  "dashboard.title": "MediaForge",
 };
 
 export const ko: Record<Key, string> = {
@@ -711,6 +771,26 @@ export const ko: Record<Key, string> = {
   "styles.samplesPlaceholder": "샘플 3~5개를 붙여 넣으세요: 기사 링크 또는 본문.\n여러 개는 ---만 있는 줄로 구분하세요.",
   "styles.learn": "이 스타일 학습",
   "styles.empty": "아직 스타일이 없습니다. 좋아하는 기사 몇 편을 붙여 넣어 AI에게 학습시켜 보세요.",
+
+  // dashboard
+  "dashboard.metrics.composes": "작성",
+  "dashboard.metrics.exports": "내보내기",
+  "dashboard.metrics.learns": "학습 스타일",
+  "dashboard.metrics.rewrites": "다시 쓰기",
+  "dashboard.quickCompose.desc": "주제 + 참고 링크 -> 장문",
+  "dashboard.quickCompose.title": "글 작성",
+  "dashboard.quickRewrite.desc": "URL 붙여넣기 -> 4개 플랫폼 글",
+  "dashboard.quickRewrite.title": "링크 다시 쓰기",
+  "dashboard.quickSearch.desc": "코사인 유사도로 찾기",
+  "dashboard.quickSearch.title": "의미 검색",
+  "dashboard.quickSettings.desc": "테마 / 언어 / cookie",
+  "dashboard.quickSettings.title": "설정",
+  "dashboard.quickShowcase.desc": "각 컴포넌트 확인",
+  "dashboard.quickShowcase.title": "컴포넌트",
+  "dashboard.quickStyles.desc": "학습 / 수정 / 버전 관리",
+  "dashboard.quickStyles.title": "스타일",
+  "dashboard.subtitle": "링크를 붙여넣거나 주제를 입력하세요. AI가 당신의 말투로 WeChat / X / 샤오홍슈 / B站에 글을 작성합니다.",
+  "dashboard.title": "MediaForge",
 };
 
 const DICTS: Record<Locale, Record<Key, string>> = { zh, en, ja, ko };
