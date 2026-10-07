@@ -49,7 +49,8 @@ Paste any link, get platform-native posts (公众号 / X / 小红书 / B站) in 
 36. `ec2dc39` R39 — e2e/demo-flow + e2e/try-demo no longer hit example.com; Playwright context.route() serves a fixed HTML so these flake-prone cases pass offline in <2 s regardless of host reachability.
 37. `f5b4741` R40 — home page is now a real dashboard: 18 dashboard.* i18n keys x 4 locales; components/dashboard.tsx (metric strip polled from /api/metrics every 30 s + 6 quick-action cards with lucide icons + footer pill + embedded <Chat /> so 'try-demo' e2e paths still pass); 3 new e2e (home renders, language round-trip, /api/metrics shape).
 38. `274d107` R41/R42 — OpenAPI 3.1 spec at lib/openapi-spec.ts (16 paths, 6 schemas, UserIdHeader security scheme, NO_DB/NotFound/BadRequest shared responses); served by app/api/openapi.json/route.ts; rendered by /docs via Stoplight Elements CDN; nav + i18n gains 'nav.docs'; 6 unit tests + 3 e2e.
-39. `9146c21` R43/R44 (tag) — README '5-minute tour' (10-step table, every step no-key) + Deployment rewritten with concrete Vercel+Neon flow (link signup, /api/health check, social-preview png upload); vercel.json (framework nextjs, route-cache headers, sin1 region, $schema pinned). Prettier newline cleanups.
+39. `9146c21` R43/R44 — README '5-minute tour' (10-step table, every step no-key) + Deployment rewritten with concrete Vercel+Neon flow (link signup, /api/health check, social-preview png upload); vercel.json (framework nextjs, route-cache headers, sin1 region, $schema pinned). Prettier newline cleanups.
+40. `7821c80` R45 (tag) — OpenAPI examples for 5 core routes so /docs (Stoplight Elements) renders real request bodies and 200 responses: /api/rewrite request (URL + platforms + style + instruction) + 200 (source + media + 4 platform posts); /api/compose request; /api/style/learn request (name + 3 samples) + 200 (full style w/ features); /api/styles GET 200 (two sample styles).
 
 ## Known limits
 
