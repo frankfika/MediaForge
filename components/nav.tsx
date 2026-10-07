@@ -12,8 +12,9 @@ const LINKS: { href: string; label: Key }[] = [
   { href: "/editor", label: "nav.editor" },
   { href: "/styles", label: "nav.styles" },
   { href: "/search", label: "nav.search" },
-  { href: "/settings", label: "nav.settings" },
   { href: "/showcase", label: "nav.showcase" },
+  { href: "/docs", label: "nav.docs" },
+  { href: "/settings", label: "nav.settings" },
 ];
 
 export function Nav() {
