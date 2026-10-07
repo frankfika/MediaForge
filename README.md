@@ -29,6 +29,25 @@ pnpm dev                          # 3. http://localhost:3000
 
 <img src="docs/assets/demo.gif" alt="demo" width="720" />
 
+## 5-minute tour
+
+如果你是第一次接触 MediaForge,按下面顺序走一遍最快:
+
+| Step | 做什么                                                                                                        | 在哪                         |
+| ---- | ------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| 1    | **看 dashboard**:6 个 quick action 卡 + 4 个 metric                                                           | `/`                          |
+| 2    | **改写一条链接**:粘贴 `https://x.com/jack/status/20`,4 个平台草稿立刻出来                                     | `/rewrite`                   |
+| 3    | **一键试一下 demo**:`/` 上「试一下」按钮自动加载示例风格并改写 example.com                                    | `/`                          |
+| 4    | **学习你的风格**:贴几篇你写过的文章 → 提取句长 + 节奏 + 标志词                                                | `/styles` → 「加载演示风格」 |
+| 5    | **测评文本**:把你准备发的草稿放进去,看 5 个信号分(句长/词汇/节奏/句数/禁忌)                                   | `/styles` → 卡片「测评」     |
+| 6    | **创作**:话题 + 参考链接 → 流式长文 → 平台适配稿                                                              | `/editor`                    |
+| 7    | **语义搜索**:`/search` 看 cosine 排序(演示用 mock embeddings)                                                 | `/search`                    |
+| 8    | **MCP**:`pnpm demo:mcp` 起 MCP server;在 Claude Code/Cursor/Codex 里挂载后调用 `rewrite_url`/`learn_style` 等 | `docs/mcp-guide.md`          |
+| 9    | **API 文档**:`/docs` 用 Stoplight Elements 渲染 OpenAPI 3.1 spec;`/api/openapi.json` 是 raw JSON              | `/docs`                      |
+| 10   | **云端同步**(可选):`DATABASE_URL=...` → 「风格」页出现云端 tab + 版本历史 + 回滚                              | `/styles`                    |
+
+每个步骤都不依赖任何 key,即可走通完整 demo 流程。
+
 ## Features
 
 |                | 特性                                                                                                                                                                                                 |
@@ -86,14 +105,19 @@ pnpm dev                          # 3. http://localhost:3000
 
 ## Deployment
 
-Vercel + Neon,约 5 分钟:
+### Vercel + Neon,约 5 分钟
 
-1. 导入 GitHub 仓库到 Vercel(自动识别 Next.js)
-2. Neon 新建项目,`DATABASE_URL="…" pnpm db:push`
-3. 在 Vercel 配置上表环境变量,Deploy
-4. 访问 `/api/health` 确认 `llm` 字段
+1. 把仓库导入 Vercel — 框架会自动识别 Next.js(`vercel.json` 已写好缓存与 cron 字段)
+2. 可选:在 [Neon](https://neon.tech) 新建项目,拷连接串(带 `?sslmode=require`)。本地一次 `DATABASE_URL="…" pnpm db:push` 推 schema
+3. Vercel → Project Settings → Environment Variables,贴这些(全部可选):
+   - `ANTHROPIC_API_KEY` — 留空走 mock LLM;设了就用 Claude
+   - `OPENAI_API_KEY` — 设了 `/api/embed` 切到真 text-embedding-3-small
+   - `FIRECRAWL_API_KEY` — 设了 `/api/rewrite` 抓登录墙内容
+   - `DATABASE_URL` — 设了云端风格同步/复制/重命名/版本历史可用
+4. Deploy。打开 `/api/health` → `"mode":"anthropic"`(设了 key) 或 `"mode":"mock"`(没设)
+5. 上传 GitHub Social Preview:Settings → Social preview → 拖 `docs/assets/social-preview.png`(1280×640)
 
-完整说明:[docs/deployment.md](docs/deployment.md)。
+完整说明(手动检查清单、Neon 步骤、Docker Compose):[docs/deployment.md](docs/deployment.md)。
 
 ### Docker 自托管
 
