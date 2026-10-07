@@ -139,15 +139,70 @@ export const openapiSpec = {
       post: {
         tags: ["Rewrite"],
         summary: "Paste a link to platform-native posts",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "rewrite result", content: { "application/json": { schema: { type: "object" as const } } } } },
+        description:
+          "URL is fetched in-process (X fxtwitter, Bilibili view API, WeChat /js_content, Readability fallback). Without ANTHROPIC_API_KEY the response uses the deterministic mock LLM.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                url: "https://x.com/jack/status/20",
+                platforms: ["wechat", "x", "xhs", "bilibili"],
+                style: { id: "00000000-0000-4000-8000-000000000001", name: "极简技术流", prompt: "短句为主", version: 1 },
+                instruction: "保留代码块和链接",
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "rewrite result",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  source: {
+                    url: "https://x.com/jack/status/20",
+                    title: "first tweet",
+                    author: "jack",
+                    text: "just setting up my twttr",
+                    images: [],
+                    videos: [],
+                  },
+                  media: { images: [], videos: [] },
+                  posts: [
+                    { platform: "wechat", title: "第一条推文的诞生", body: "2006 年 3 月 21 日,Twitter 诞生了..." },
+                    { platform: "x", body: "第一条推文改写版:Twitter 诞生记 (140 字符)" },
+                    { platform: "xhs", title: "✨ Twitter 诞生记", body: "姐妹们!你们知道 Twitter..." },
+                    { platform: "bilibili", title: "【Twitter 诞生记】", body: "本期讲讲 Twitter 是怎么来的..." },
+                  ],
+                },
+              },
+            },
+          },
+          "400": { description: "missing url/source" },
+        },
       },
     },
     "/api/compose": {
       post: {
         tags: ["Compose"],
         summary: "Topic + reference links to long-form draft",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
+        description: "Streams a Markdown long-form draft; combine with /api/rewrite's pass to adapt to each platform.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                prompt: "AI 编程助手的下一步会是什么",
+                links: ["https://example.com/some-article"],
+                style: { id: "00000000-0000-4000-8000-000000000002", name: "公众号深度评论", prompt: "反常识开篇,层层递进", version: 1 },
+              },
+            },
+          },
+        },
         responses: { "200": { description: "text/plain stream", content: { "text/plain": { schema: { type: "string" as const } } } } },
       },
     },
@@ -162,9 +217,43 @@ export const openapiSpec = {
     "/api/style/learn": {
       post: {
         tags: ["Style"],
-        summary: "Extract a style prompt from samples",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "new style", content: { "application/json": { schema: { type: "object" as const } } } } },
+        summary: "Extract a style prompt from samples (URLs or raw text)",
+        description: "URLs in samples are fetched + Readability-stripped; raw text is used directly.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                name: "我的公众号",
+                samples: ["https://myblog.com/post-1", "https://myblog.com/post-2", "我写公众号 5 年了,核心是讲故事。"],
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "new style",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  id: "00000000-0000-4000-8000-000000000099",
+                  name: "我的公众号",
+                  prompt: "用讲故事的方式打开每一段;不堆形容词,先讲一个具体场景,再提炼观点。",
+                  features: {
+                    avgSentenceLength: 22,
+                    vocabulary: ["故事", "场景", "提炼", "反常识"],
+                    rhythm: "medium sentences with occasional short",
+                    devices: ["anecdote", "contrast"],
+                    taboos: ["cliché openers", "hyperbole"],
+                  },
+                  version: 1,
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/style/refine": {
@@ -191,7 +280,27 @@ export const openapiSpec = {
         responses: {
           "200": {
             description: "ok",
-            content: { "application/json": { schema: { type: "array" as const, items: { $ref: "#/components/schemas/ApiStyle" } } } },
+            content: {
+              "application/json": {
+                schema: { type: "array" as const, items: { $ref: "#/components/schemas/ApiStyle" } },
+                example: [
+                  {
+                    id: "00000000-0000-4000-8000-000000000001",
+                    name: "极简技术流",
+                    currentVersion: 2,
+                    prompt: "短句为主。",
+                    createdAt: "2026-10-06T16:00:00.000Z",
+                  },
+                  {
+                    id: "00000000-0000-4000-8000-000000000002",
+                    name: "公众号深度评论",
+                    currentVersion: 1,
+                    prompt: "反常识开篇。",
+                    createdAt: "2026-10-06T16:30:00.000Z",
+                  },
+                ],
+              },
+            },
           },
           "503": { $ref: "#/components/responses/NoDb" },
         },
