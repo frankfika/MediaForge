@@ -267,8 +267,48 @@ export const openapiSpec = {
       post: {
         tags: ["Export"],
         summary: "WeChat inline HTML + per-platform Markdown + ZIP-ready files",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "bundle", content: { "application/json": { schema: { type: "object" as const } } } } },
+        description:
+          "Returns { wechat_html, x_txt, xhs_md, bilibili_md, files[] } so the client can render the per-platform preview, copy the WeChat HTML straight into the editor, and trigger a client-side ZIP download with images bundled in.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                posts: [
+                  { platform: "wechat", title: "Twitter 诞生记", body: "2006 年 3 月 21 日,jack 发出了第一条推文..." },
+                  { platform: "x", body: "Twitter 诞生记(140 字符版):jack 2006 年 3 月 21 日发首条推文。" },
+                  { platform: "xhs", title: "✨ Twitter 诞生记", body: "姐妹们!你们知道 Twitter 是怎么诞生的吗?" },
+                  { platform: "bilibili", title: "【Twitter 诞生记】", body: "本期讲讲 Twitter 是怎么诞生的。" },
+                ],
+                media: { images: [], videos: [] },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Export bundle (client-side ZIP-friendly)",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  wechat_html: '<section style="..."><h1>Twitter 诞生记</h1><p>2006 年 3 月 21 日...</p></section>',
+                  x_txt: "Twitter 诞生记(140 字符版):jack 2006 年 3 月 21 日发首条推文。",
+                  xhs_md: "# ✨ Twitter 诞生记\n\n姐妹们!你们知道 Twitter 是怎么诞生的吗?",
+                  bilibili_md: "# 【Twitter 诞生记】\n\n本期讲讲 Twitter 是怎么诞生的。",
+                  files: [
+                    { name: "wechat.html", content: "<section ..." },
+                    { name: "x.txt", content: "..." },
+                    { name: "xhs.md", content: "..." },
+                    { name: "bilibili.md", content: "..." },
+                    { name: "media.txt", content: "" },
+                  ],
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/style/learn": {
@@ -317,8 +357,39 @@ export const openapiSpec = {
       post: {
         tags: ["Style"],
         summary: "Refine a style from feedback and/or original/edited pair",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "refined style", content: { "application/json": { schema: { type: "object" as const } } } } },
+        description:
+          "Either a free-text `feedback` string, an `original`+`edited` diff, or both. The route appends a new version to the style's history and returns the full updated style + a one-line changelog.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                style: { id: "00000000-0000-4000-8000-000000000001", name: "极简技术流", prompt: "短句为主。", version: 1 },
+                feedback: "反例少一些,更口语",
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "refined style (version bumped)",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  style: {
+                    id: "00000000-0000-4000-8000-000000000001",
+                    name: "极简技术流",
+                    prompt: "短句为主。反例少一些,更口语。",
+                    version: 2,
+                  },
+                  changelog: ["applied user feedback: 反例少一些,更口语"],
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/style/judge": {
@@ -399,10 +470,39 @@ export const openapiSpec = {
       post: {
         tags: ["Styles"],
         summary: "Create or upsert a style",
+        description:
+          "Upsert by client-generated id. The first version is captured automatically; features are persisted as JSONB (null is normalised to undefined at the boundary).",
         parameters: [{ $ref: "#/components/parameters/UserId" }],
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                id: "00000000-0000-4000-8000-000000000001",
+                name: "极简技术流",
+                prompt: "短句为主。",
+                features: { avgSentenceLength: 12, vocabulary: ["结论先行", "本质", "取舍"] },
+              },
+            },
+          },
+        },
         responses: {
-          "200": { description: "ok", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiStyle" } } } },
+          "200": {
+            description: "ok",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiStyle" },
+                example: {
+                  id: "00000000-0000-4000-8000-000000000001",
+                  name: "极简技术流",
+                  currentVersion: 1,
+                  prompt: "短句为主。",
+                  createdAt: "2026-10-08T14:00:00.000Z",
+                },
+              },
+            },
+          },
           "503": { $ref: "#/components/responses/NoDb" },
         },
       },
