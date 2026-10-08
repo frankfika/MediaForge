@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <style>
+    :root { color-scheme: light dark; }
+    rect { fill: currentColor; }
+  </style>
+  <rect x="0" y="0" width="32" height="32" rx="6" />
+  <g transform="translate(6 6)" fill="#fff">
+    <!-- "M" for MediaForge -->
+    <path d="M2 20 V4 L7 16 L12 4 V20 H10 V10 L7 18 L4 10 V20 Z" />
+    <!-- chat-dot: 4 small squares standing in for the 4 platforms -->
+    <rect x="14" y="4" width="2" height="2" />
+    <rect x="14" y="9" width="2" height="2" />
+    <rect x="14" y="14" width="2" height="2" />
+    <rect x="14" y="19" width="2" height="2" />
+  </g>
+</svg>
