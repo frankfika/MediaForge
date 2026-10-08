@@ -44,17 +44,22 @@ MediaForge 通过 MCP 暴露工具,可以被 Claude Code / Cursor / Codex 调用
 
 ## v0.1 的数字
 
-- 7 个页面 + 19 个 API 路由(含 `/api/ping` liveness + `/api/health` services/build/uptime)
-- 191 个文件,约 11500 行 TypeScript / TSX
-- 290 个单元测试(行覆盖 99.83%,分支 98.01%)+ 38 个 Playwright 端到端测试(全部 offline,Playwright `context.route()` stub 替代真实网络)
+- 7 个页面 + 19 个 API 路由(含 `/api/ping` liveness + `/api/health` services/build/uptime/22-endpoint 列表)
+- 195 个文件,约 12000 行 TypeScript / TSX
+- 300+ 个单元测试(行覆盖 99.83%,分支 98.01%)+ 52 个 Playwright 端到端测试(全部 offline,Playwright `context.route()` stub 替代真实网络)
 - 四语 UI(zh / en / ja / ko;175+ 字典 key,parity 测试防漂移)
-- OpenAPI 3.1 spec + Stoplight Elements 渲染的 `/docs` viewer;7 路由有真实 requestBody / 200 response examples
+- OpenAPI 3.1 spec + Stoplight Elements 渲染的 `/docs` viewer;17 路由有真实 requestBody / 200 response examples(包括 /api/chat 的 SSE 流示例)
 - Home page 是真 dashboard:4 个 metric(30s 轮询 `/api/metrics`)+ 6 个 quick action 卡
 - `/api/embed` 接 OpenAI `text-embedding-3-small`(`OPENAI_API_KEY` 即可,无 key 走 mock)
 - `/api/search` retrieval over corpus(默认 5 文档)
 - `/api/styles/[id]/{duplicate,rename,history,export}` 全套云端操作
 - 风格盲测算法:5 信号加权(句长 0.25 / 词汇 0.25 / 节奏 0.20 / 句数 0.10 / 禁忌 0.20)
 - MCP server stdio;`pnpm demo:mcp` 一行命令;Claude Code / Cursor / Codex 直连
+- `/api/chat` SSE 流式接口(无 key 返 500 + JSON body;设 `ANTHROPIC_API_KEY` 后流式 AI SDK v5 UIMessage)
+- `/api/styles/{id}/export` 单文件下载(slug 文件名 + content-disposition)+ `/api/styles/{id}/{duplicate,rename,history}` 全套 6 个 sub-routes
+- `scripts/preview.sh` 部署前冒烟(typecheck + 300+ vitest + 52 e2e + next build + 11 个 curl 真实打 endpoint)
+- `scripts/push.sh` 安全推送(secret-leak + remote + tag 检查 + `--check` dry-run + GitHub Release URL hint)
+- `package.json` 含 description/license/keywords/repository 给 npm + Vercel 自动发现
 - 公众号富文本 HTML 复制(行内样式,绕开微信编辑器 strip)+ ZIP 一键下载
 - 全局 ⌘K 抽屉:任何页面都能召出 chat
 - 主题切换(浅色/深色/跟随系统,cookie 持久化)+ 5-minute tour README + vercel.json + .editorconfig + scripts/push.sh 安全推送
