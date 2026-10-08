@@ -441,6 +441,25 @@ export const openapiSpec = {
         responses: { "200": { description: "ok", content: { "application/json": { schema: { type: "object" as const } } } } },
       },
     },
+    "/api/ping": {
+      get: {
+        tags: ["Ops"],
+        summary: "Trivial liveness probe (always 200, no metrics, no DB, no LLM)",
+        description:
+          "Use for load-balancer / uptime-monitor health checks. The response is always 200; richer service-level status lives at /api/health.",
+        responses: {
+          "200": {
+            description: "ok",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: { pong: true, at: "2026-10-08T14:00:00.000Z" },
+              },
+            },
+          },
+        },
+      },
+    },
     "/mcp-guide.md": {
       get: {
         tags: ["Ops"],
