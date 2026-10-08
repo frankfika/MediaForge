@@ -197,6 +197,7 @@ export const zh = {
   "dashboard.quickStyles.title": "风格库",
   "dashboard.subtitle": "粘贴一个链接,或说一个话题。用你自己的文风,改写给公众号 / X / 小红书 / B 站。",
   "dashboard.title": "MediaForge",
+  "dashboard.playground": "打开组件预览",
 
   "nav.docs": "API 文档",
 } as const;
@@ -398,6 +399,7 @@ export const en: Record<Key, string> = {
   "dashboard.quickStyles.title": "Style library",
   "dashboard.subtitle": "Paste a link or name a topic. AI writes in your voice for WeChat / X / Xiaohongshu / Bilibili.",
   "dashboard.title": "MediaForge",
+  "dashboard.playground": "Open the component playground",
 
   "nav.docs": "API docs",
 };
@@ -598,6 +600,7 @@ export const ja: Record<Key, string> = {
   "dashboard.quickStyles.title": "スタイル",
   "dashboard.subtitle": "リンクを貼るか、話題を入力。あなたの声で WeChat / X / 小紅書 / Bilibili に書き分けます。",
   "dashboard.title": "MediaForge",
+  "dashboard.playground": "コンポーネントのプレイグラウンドを開く",
 
   "nav.docs": "API ドキュメント",
 };
@@ -797,6 +800,7 @@ export const ko: Record<Key, string> = {
   "dashboard.quickStyles.title": "스타일",
   "dashboard.subtitle": "링크를 붙여넣거나 주제를 입력하세요. AI가 당신의 말투로 WeChat / X / 샤오홍슈 / B站에 글을 작성합니다.",
   "dashboard.title": "MediaForge",
+  "dashboard.playground": "컴포넌트 플레이그라운드 열기",
 
   "nav.docs": "API 문서",
 };

@@ -86,7 +86,7 @@ export function Dashboard() {
         className="flex items-center justify-center gap-2 self-start rounded-full border border-line px-4 py-2 text-xs text-muted transition hover:text-fg"
       >
         <Sparkles className="size-3.5" aria-hidden />
-        <span data-testid="dashboard-try">Open the component playground</span>
+        <span data-testid="dashboard-try">{t("dashboard.playground")}</span>
       </Link>
 
       <section className="mt-2 border-t border-line pt-6">
