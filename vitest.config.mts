@@ -10,6 +10,7 @@ export default defineConfig({
     env: { METRICS_FILE: join(tmpdir(), "mediaforge-test-metrics.json") }, // keep tests out of .data/
     environment: "happy-dom",
     pool: "vmThreads",
+    isolate: false, // share happy-dom context across files; tests use unstubAllGlobals so they remain isolated
     include: ["lib/**/*.test.ts", "components/**/*.test.tsx"],
     exclude: ["e2e/**", "node_modules/**"],
     coverage: {
