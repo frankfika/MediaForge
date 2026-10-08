@@ -507,6 +507,181 @@ export const openapiSpec = {
         },
       },
     },
+    "/api/styles/{id}": {
+      parameters: [
+        { in: "path" as const, name: "id", required: true, schema: { type: "string" as const, format: "uuid" as const } },
+        { $ref: "#/components/parameters/UserId" },
+      ],
+      get: {
+        tags: ["Styles"],
+        summary: "Fetch a single style + its full version history",
+        security: [{ UserIdHeader: [] }],
+        responses: {
+          "200": {
+            description: "ok",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiStyle" },
+                example: {
+                  id: "00000000-0000-4000-8000-000000000001",
+                  name: "极简技术流",
+                  currentVersion: 2,
+                  prompt: "短句为主。",
+                  createdAt: "2026-10-08T14:00:00.000Z",
+                  versions: [
+                    { version: 2, prompt: "短句为主。", changelog: ["v2"], createdAt: "2026-10-08T14:30:00.000Z" },
+                    { version: 1, prompt: "短句。", changelog: ["v1"], createdAt: "2026-10-08T14:00:00.000Z" },
+                  ],
+                },
+              },
+            },
+          },
+          "404": { $ref: "#/components/responses/NotFound" },
+          "503": { $ref: "#/components/responses/NoDb" },
+        },
+      },
+      delete: {
+        tags: ["Styles"],
+        summary: "Delete a style (versions cascade)",
+        security: [{ UserIdHeader: [] }],
+        responses: {
+          "204": { description: "deleted" },
+          "404": { $ref: "#/components/responses/NotFound" },
+          "503": { $ref: "#/components/responses/NoDb" },
+        },
+      },
+    },
+    "/api/styles/{id}/duplicate": {
+      parameters: [
+        { in: "path" as const, name: "id", required: true, schema: { type: "string" as const, format: "uuid" as const } },
+        { $ref: "#/components/parameters/UserId" },
+      ],
+      post: {
+        tags: ["Styles"],
+        summary: "Copy a style into a new uuid (name suffix '(copy)')",
+        security: [{ UserIdHeader: [] }],
+        requestBody: {
+          required: false,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const, properties: { name: { type: "string" as const, minLength: 1, maxLength: 60 } } },
+              example: { name: "极简技术流 (copy)" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "ok (new uuid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiStyle" },
+                example: {
+                  id: "00000000-0000-4000-8000-000000000999",
+                  name: "极简技术流 (copy)",
+                  currentVersion: 1,
+                  prompt: "短句为主。",
+                  createdAt: "2026-10-08T15:00:00.000Z",
+                },
+              },
+            },
+          },
+          "404": { $ref: "#/components/responses/NotFound" },
+          "503": { $ref: "#/components/responses/NoDb" },
+        },
+      },
+    },
+    "/api/styles/{id}/rename": {
+      parameters: [
+        { in: "path" as const, name: "id", required: true, schema: { type: "string" as const, format: "uuid" as const } },
+        { $ref: "#/components/parameters/UserId" },
+      ],
+      post: {
+        tags: ["Styles"],
+        summary: "Rename a style (history untouched)",
+        security: [{ UserIdHeader: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object" as const,
+                required: ["name"],
+                properties: { name: { type: "string" as const, minLength: 1, maxLength: 60 } },
+              },
+              example: { name: "极简技术流 v2" },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "ok", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiStyle" } } } },
+          "400": { $ref: "#/components/responses/BadRequest" },
+          "503": { $ref: "#/components/responses/NoDb" },
+        },
+      },
+    },
+    "/api/styles/{id}/export": {
+      parameters: [
+        { in: "path" as const, name: "id", required: true, schema: { type: "string" as const, format: "uuid" as const } },
+        { $ref: "#/components/parameters/UserId" },
+      ],
+      get: {
+        tags: ["Styles"],
+        summary: "Download a style as a JSON attachment (slug filename)",
+        description:
+          'The response Content-Disposition header carries `attachment; filename="<slug>.json"` so a curl -OJ saves it to disk. The slug is the kebab-cased style name with CJK preserved.',
+        security: [{ UserIdHeader: [] }],
+        responses: {
+          "200": {
+            description: "attachment",
+            content: {
+              "application/json": { schema: { $ref: "#/components/schemas/ApiStyle" } },
+              headers: {
+                "content-disposition": {
+                  schema: { type: "string" as const },
+                  example: 'attachment; filename="极简技术流.json"',
+                },
+              },
+            },
+          },
+          "404": { $ref: "#/components/responses/NotFound" },
+          "503": { $ref: "#/components/responses/NoDb" },
+        },
+      },
+    },
+    "/api/styles/{id}/history": {
+      parameters: [
+        { in: "path" as const, name: "id", required: true, schema: { type: "string" as const, format: "uuid" as const } },
+        { $ref: "#/components/parameters/UserId" },
+      ],
+      get: {
+        tags: ["Styles"],
+        summary: "Return only the version history (newest first)",
+        description:
+          "Semantic alias of GET /api/styles/{id} that returns just the versions array. Useful when a UI only needs the changelog and not the full current style.",
+        security: [{ UserIdHeader: [] }],
+        responses: {
+          "200": {
+            description: "ok",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object" as const,
+                  properties: { versions: { type: "array" as const, items: { $ref: "#/components/schemas/StyleVersion" } } },
+                },
+                example: {
+                  versions: [
+                    { version: 2, prompt: "短句为主。", changelog: ["v2"], createdAt: "2026-10-08T14:30:00.000Z" },
+                    { version: 1, prompt: "短句。", changelog: ["v1"], createdAt: "2026-10-08T14:00:00.000Z" },
+                  ],
+                },
+              },
+            },
+          },
+          "404": { $ref: "#/components/responses/NotFound" },
+          "503": { $ref: "#/components/responses/NoDb" },
+        },
+      },
+    },
     "/api/embed": {
       post: {
         tags: ["Embed"],

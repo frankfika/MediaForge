@@ -2,6 +2,28 @@
   "name": "mediaforge",
   "version": "0.1.0",
   "private": true,
+  "description": "AI-native multi-platform writing: paste a link or a topic, get platform-native posts in your voice for WeChat / X / Xiaohongshu / Bilibili. Built on Next.js 15 + AI SDK v5 + Drizzle + MCP.",
+  "license": "MIT",
+  "homepage": "https://github.com/frankfika/MediaForge#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frankfika/MediaForge.git"
+  },
+  "bugs": "https://github.com/frankfika/MediaForge/issues",
+  "keywords": [
+    "ai",
+    "anthropic",
+    "content-creation",
+    "content-marketing",
+    "creator-economy",
+    "mcp",
+    "model-context-protocol",
+    "multi-platform",
+    "nextjs",
+    "social-media",
+    "typescript",
+    "writing-assistant"
+  ],
   "packageManager": "pnpm@10.0.0",
   "scripts": {
     "dev": "next dev --turbopack",
