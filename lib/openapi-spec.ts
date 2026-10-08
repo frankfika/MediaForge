@@ -113,16 +113,62 @@ export const openapiSpec = {
       get: {
         tags: ["Metrics"],
         summary: "In-memory usage counters",
-        responses: { "200": { description: "ok", content: { "application/json": { schema: { type: "object" as const } } } } },
+        description:
+          "Reflects real HTTP calls to /rewrite, /compose, /style/learn, /style/refine, /export, /embed and /fetcher. Mirrored to .data/metrics.json; resets only on missing or corrupt JSON.",
+        responses: {
+          "200": {
+            description: "ok",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  rewrites: 58,
+                  composes: 30,
+                  learns: 28,
+                  refines: 28,
+                  exports: 0,
+                  embeds: 179,
+                  fetches: 35,
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/chat": {
       post: {
         tags: ["Chat"],
-        summary: "Streaming AI chat (tool-use loop)",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
+        summary: "Streaming AI chat (tool-use loop, default Claude Sonnet)",
+        description:
+          "AI SDK v5 UIMessage stream (text/event-stream). Tools: fetch_link, rewrite_post. Without ANTHROPIC_API_KEY the upstream call returns 500; the chat UI surfaces the error and keeps the conversation.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                messages: [{ role: "user", content: "帮我把这条 tweet 改写成 4 个平台版本" }],
+                style: { id: "00000000-0000-4000-8000-000000000001", name: "极简技术流", prompt: "短句为主。", version: 1 },
+              },
+            },
+          },
+        },
         responses: {
-          "200": { description: "UIMessage stream", content: { "text/event-stream": { schema: { type: "string" as const } } } },
+          "200": {
+            description: "UIMessage stream",
+            content: {
+              "text/event-stream": {
+                schema: { type: "string" as const },
+                example:
+                  'data: {"type":"start"}\\n\\ndata: {"type":"text-start","id":"msg1"}\\n\\ndata: {"type":"text-delta","id":"msg1","delta":"结论："}\\n\\ndata: {"type":"tool-input-available","toolCallId":"tc1","toolName":"rewrite_post","input":{"url":"https://x.com/jack/status/20","platforms":["wechat","x","xhs","bilibili"]}}\\n\\ndata: {"type":"text-end","id":"msg1"}\\n\\ndata: {"type":"finish-step","finishReason":"tool-calls"}\\n\\ndata: [DONE]',
+              },
+            },
+          },
+          "500": {
+            description: "no ANTHROPIC_API_KEY; fallback mock would not apply here (chat tool loop needs a real model)",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Problem" } } },
+          },
         },
       },
     },
@@ -203,7 +249,18 @@ export const openapiSpec = {
             },
           },
         },
-        responses: { "200": { description: "text/plain stream", content: { "text/plain": { schema: { type: "string" as const } } } } },
+        responses: {
+          "200": {
+            description: "text/plain stream",
+            content: {
+              "text/plain": {
+                schema: { type: "string" as const },
+                example:
+                  "# AI 编程助手的下一步会是什么\n\n## 为什么现在谈这个\n\n围绕「AI 编程助手的下一步」,先讲背景,再讲关键判断,最后给出可执行的建议。\n\n## 关键判断\n\n(待补充:你的观点)\n\n## 接下来怎么做\n\n(待补充:行动建议)",
+              },
+            },
+          },
+        },
       },
     },
     "/api/export": {
@@ -391,7 +448,25 @@ export const openapiSpec = {
         tags: ["Embed"],
         summary: "GET retrieval: ranked similarity over corpus",
         parameters: [{ in: "path" as const, name: "query", required: true, schema: { type: "string" as const } }],
-        responses: { "200": { description: "ranked", content: { "application/json": { schema: { type: "object" as const } } } } },
+        responses: {
+          "200": {
+            description: "ranked",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  provider: "mock",
+                  model: "mock-fnv1a",
+                  query: "MediaForge",
+                  results: [
+                    { text: "改写是核心", score: 0.82 },
+                    { text: "风格学习", score: -0.15 },
+                  ],
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/search": {
