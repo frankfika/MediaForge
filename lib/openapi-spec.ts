@@ -268,8 +268,42 @@ export const openapiSpec = {
       post: {
         tags: ["Style"],
         summary: "Heuristically score a text against a style",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "score", content: { "application/json": { schema: { type: "object" as const } } } } },
+        description:
+          "Returns 5 weighted signals (sentence length, vocabulary overlap, rhythm match, sentence count, taboo compliance), a 0-100 score, and a feedback string. Weights are in lib/style-judge.ts#WEIGHTS.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                style: { id: "00000000-0000-4000-8000-000000000001", name: "极简技术流", prompt: "短句为主。", version: 1 },
+                sampleText: "结论先行。本质是取舍。实现成本很低。边界要写清楚。",
+                referenceTexts: ["结论先行。本质是取舍。实现成本很低。边界要写清楚。", "取舍决定成本。结论很简单。"],
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "score",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  score: 84,
+                  signals: {
+                    sentenceLength: 0.98,
+                    vocabularyOverlap: 0.34,
+                    rhythmMatch: 1.0,
+                    sentenceCountMatch: 0.8,
+                    tabooCompliance: 1.0,
+                  },
+                  feedback: "很像(84 分)。最弱项「词汇重叠」34%:高频词几乎不重合,多用参考样本里的标志词。",
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/styles": {
@@ -320,8 +354,36 @@ export const openapiSpec = {
       post: {
         tags: ["Embed"],
         summary: "Mock 64-dim embeddings (or OpenAI text-embedding-3-small)",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "vectors", content: { "application/json": { schema: { type: "object" as const } } } } },
+        description:
+          "Without OPENAI_API_KEY, returns 64-dim hash-seeded vectors. With the key, calls /v1/embeddings and returns the native dim.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: { texts: ["hello world", "foo bar"] },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "vectors",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  embeddings: [
+                    [0.001, -0.5, 0.3],
+                    [0.4, -0.2, 0.1],
+                  ],
+                  provider: "mock",
+                  model: "mock-fnv1a",
+                  dim: 64,
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/embed/{query}": {
@@ -335,9 +397,41 @@ export const openapiSpec = {
     "/api/search": {
       post: {
         tags: ["Search"],
-        summary: "Semantic search over a corpus",
-        requestBody: { required: true, content: { "application/json": { schema: { type: "object" as const } } } },
-        responses: { "200": { description: "ranked", content: { "application/json": { schema: { type: "object" as const } } } } },
+        summary: "Semantic search over a corpus with deterministic ranking",
+        description:
+          "Returns topK results sorted by cosineSim against the query embedding. With OPENAI_API_KEY the embeddings come from /v1/embeddings.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object" as const },
+              example: {
+                query: "怎么改写",
+                corpus: ["改写是核心", "风格学习", "完全不相关"],
+                topK: 3,
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "ranked",
+            content: {
+              "application/json": {
+                schema: { type: "object" as const },
+                example: {
+                  provider: "mock",
+                  model: "mock-fnv1a",
+                  results: [
+                    { text: "改写是核心", score: 0.82 },
+                    { text: "风格学习", score: -0.15 },
+                    { text: "完全不相关", score: -0.31 },
+                  ],
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/api/openapi.json": {
