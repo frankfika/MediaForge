@@ -44,11 +44,21 @@ MediaForge 通过 MCP 暴露工具,可以被 Claude Code / Cursor / Codex 调用
 
 ## v0.1 的数字
 
-- 7 个页面 + 19 个 API 路由
-- 166 个文件,约 9800 行 TypeScript / TSX
-- 236 个单元测试(行覆盖 99.8%+,分支 98%+)+ 23 个 Playwright 端到端测试
-- 中英日三语 UI(zh / en / ja)
-- 从零开始的 onboarding、组件预览页、语义搜索 demo
+- 7 个页面 + 19 个 API 路由(含 `/api/ping` liveness + `/api/health` services/build/uptime)
+- 191 个文件,约 11500 行 TypeScript / TSX
+- 290 个单元测试(行覆盖 99.83%,分支 98.01%)+ 38 个 Playwright 端到端测试(全部 offline,Playwright `context.route()` stub 替代真实网络)
+- 四语 UI(zh / en / ja / ko;175+ 字典 key,parity 测试防漂移)
+- OpenAPI 3.1 spec + Stoplight Elements 渲染的 `/docs` viewer;7 路由有真实 requestBody / 200 response examples
+- Home page 是真 dashboard:4 个 metric(30s 轮询 `/api/metrics`)+ 6 个 quick action 卡
+- `/api/embed` 接 OpenAI `text-embedding-3-small`(`OPENAI_API_KEY` 即可,无 key 走 mock)
+- `/api/search` retrieval over corpus(默认 5 文档)
+- `/api/styles/[id]/{duplicate,rename,history,export}` 全套云端操作
+- 风格盲测算法:5 信号加权(句长 0.25 / 词汇 0.25 / 节奏 0.20 / 句数 0.10 / 禁忌 0.20)
+- MCP server stdio;`pnpm demo:mcp` 一行命令;Claude Code / Cursor / Codex 直连
+- 公众号富文本 HTML 复制(行内样式,绕开微信编辑器 strip)+ ZIP 一键下载
+- 全局 ⌘K 抽屉:任何页面都能召出 chat
+- 主题切换(浅色/深色/跟随系统,cookie 持久化)+ 5-minute tour README + vercel.json + .editorconfig + scripts/push.sh 安全推送
+- 风格学习/测评的 0-key demo 完整链路
 
 ## 路线图:v0.2 有什么
 
