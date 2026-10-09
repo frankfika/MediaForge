@@ -9,3 +9,4 @@ playwright-report/
 test-results/
 coverage/
 .data/
+.claude/launch.json

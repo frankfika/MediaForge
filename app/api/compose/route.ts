@@ -1,6 +1,6 @@
 import { streamText } from "ai";
 import { z } from "zod";
-import { model, styleSystem } from "@/lib/ai";
+import { MAX_OUT, model, styleSystem } from "@/lib/ai";
 import { fetchLink } from "@/lib/fetcher";
 import { compose, llmMode } from "@/lib/llm";
 import { route } from "@/lib/http";
@@ -26,6 +26,7 @@ export const POST = route(
       });
     const result = streamText({
       model: model(),
+      maxOutputTokens: MAX_OUT,
       system: `${styleSystem(style)}\n\nWrite an original long-form article in Markdown with a title line (# ...). Ground claims in the references when given; never invent facts or quotes.`,
       prompt: `Topic: ${prompt}\n\n${refs
         .map((r) => `<reference url="${r.url}" title="${r.title}">\n${r.text.slice(0, 6000)}\n</reference>`)

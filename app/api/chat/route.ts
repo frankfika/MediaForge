@@ -1,6 +1,6 @@
 import { convertToModelMessages, stepCountIs, streamText, tool, type UIMessage } from "ai";
 import { z } from "zod";
-import { CHAT_SYSTEM, model, rewrite, styleSystem } from "@/lib/ai";
+import { CHAT_SYSTEM, MAX_OUT, model, rewrite, styleSystem } from "@/lib/ai";
 import { fetchLink } from "@/lib/fetcher";
 import { route } from "@/lib/http";
 import { PlatformSchema, StyleRefSchema } from "@/lib/types";
@@ -13,6 +13,7 @@ export const POST = route(
     const cookies = { xhs: xhsCookie };
     const result = streamText({
       model: model(),
+      maxOutputTokens: MAX_OUT,
       system: `${CHAT_SYSTEM}\n\n${styleSystem(style)}`,
       messages: convertToModelMessages(messages),
       stopWhen: stepCountIs(6),
@@ -34,6 +35,6 @@ export const POST = route(
         }),
       },
     });
-    return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse({ onError: (e) => (e instanceof Error ? e.message : String(e)) });
   },
 );
