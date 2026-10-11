@@ -61,7 +61,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "diff": "^9.0.0",
-    "drizzle-orm": "^0.44.0",
+    "drizzle-orm": "^0.45.3",
     "jszip": "^3.10.2",
     "linkedom": "^0.18.0",
     "lucide-react": "^0.540.0",
