@@ -36,7 +36,7 @@ jobs:
           test -s notes.md || { echo "No CHANGELOG section for $v" >&2; exit 1; }
       - name: Source tarball
         run: git archive --format=tar.gz --prefix=mediaforge-${TAG}/ -o mediaforge-${TAG}.tar.gz "$TAG"
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.TAG }}
           body_path: notes.md
